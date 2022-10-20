@@ -17,6 +17,7 @@ KOVAAKS_PLAYLIST_FOLDER_PATH = os.path.join('FPSAimTrainer','Saved','SaveGames',
 
 RESOURCES_FOLDER = os.path.join('.', 'resources')
 BANNER_PATH = os.path.join(RESOURCES_FOLDER, 'banner.png')
+ICON_ERROR_PATH = os.path.join(RESOURCES_FOLDER, 'icon_error.png')
 
 class AppGUI(tk.Tk):
 	def __init__(self):
@@ -156,7 +157,7 @@ class AppGUI(tk.Tk):
 		KSVMessageBox(	self,
 						'Error!', 
 						'Error!\nSelect the correct KovaaK\'s folder, it has the FPSAimTrainer executable in it.',
-						'icon_error.png')
+						ICON_ERROR_PATH)
 
 
 
