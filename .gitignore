@@ -133,3 +133,6 @@ dmypy.json
 /Lib
 /Scripts
 pyvenv.cfg
+
+# project
+/mockups

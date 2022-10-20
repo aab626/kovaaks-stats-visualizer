@@ -7,7 +7,7 @@ class Playlist:
 		self.scenarios_names = scenarios_names
 
 	@staticmethod
-	def from_json(playlist_path):
+	def from_kovaaks_json(playlist_path):
 		with open(playlist_path, 'r') as fp:
 			data = json.load(fp)
 
@@ -18,4 +18,4 @@ class Playlist:
 
 
 ppath = 'C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer\\FPSAimTrainer\\Saved\\SaveGames\\Playlists\\Void\'s.json'
-pl = Playlist.from_json(ppath)
+pl = Playlist.from_kovaaks_json(ppath)
