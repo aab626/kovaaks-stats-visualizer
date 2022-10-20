@@ -1,3 +1,4 @@
+import os
 import json
 
 # holds the data in a playlist 
@@ -16,6 +17,17 @@ class Playlist:
 
 		return Playlist(name, scenarios_names)
 
+	@staticmethod
+	def list_kovaaks_playlists(playlists_path):
+		playlist_names = []
+		for fname in os.listdir(playlists_path):
+			with open(os.path.join(playlists_path, fname), 'r') as fp:
+				data = json.load(fp)
 
-ppath = 'C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer\\FPSAimTrainer\\Saved\\SaveGames\\Playlists\\Void\'s.json'
-pl = Playlist.from_kovaaks_json(ppath)
+			playlist_names.append(data['playlistName'])
+
+		return playlist_names
+
+
+# ppath = 'C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer\\FPSAimTrainer\\Saved\\SaveGames\\Playlists\\Void\'s.json'
+# pl = Playlist.from_kovaaks_json(ppath)

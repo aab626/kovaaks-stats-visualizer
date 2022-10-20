@@ -204,22 +204,22 @@ class Scenario:
 
 
 
-stats_folder = os.path.join('C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer\\FPSAimTrainer\\stats')
-scenarios = Scenario.list_scenarios(stats_folder)
+# stats_folder = os.path.join('C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer\\FPSAimTrainer\\stats')
+# scenarios = Scenario.list_scenarios(stats_folder)
 
-s1_path = os.path.join(stats_folder, 'VoxTargetSwitch Click Small - Challenge - 2022.10.19-13.51.05 Stats.csv')
-s2_path = os.path.join(stats_folder, 'VoxTargetSwitch Click Small - Challenge - 2022.10.19-13.52.18 Stats.csv')
-s3_path = os.path.join(stats_folder, 'VoxTargetSwitch Click Small - Challenge - 2022.10.19-13.53.23 Stats.csv')
-s4_path = os.path.join(stats_folder, 'VoxTargetSwitch Click Small - Challenge - 2022.10.19-13.54.28 Stats.csv')
-s5_path = os.path.join(stats_folder, 'VoxTargetSwitch Click Small - Challenge - 2022.10.19-13.55.33 Stats.csv')
+# s1_path = os.path.join(stats_folder, 'VoxTargetSwitch Click Small - Challenge - 2022.10.19-13.51.05 Stats.csv')
+# s2_path = os.path.join(stats_folder, 'VoxTargetSwitch Click Small - Challenge - 2022.10.19-13.52.18 Stats.csv')
+# s3_path = os.path.join(stats_folder, 'VoxTargetSwitch Click Small - Challenge - 2022.10.19-13.53.23 Stats.csv')
+# s4_path = os.path.join(stats_folder, 'VoxTargetSwitch Click Small - Challenge - 2022.10.19-13.54.28 Stats.csv')
+# s5_path = os.path.join(stats_folder, 'VoxTargetSwitch Click Small - Challenge - 2022.10.19-13.55.33 Stats.csv')
 
-scen = Scenario(s1_path)
+# scen = Scenario(s1_path)
 
 
-sc_list = [Scenario(s_path) for s_path in [s1_path, s2_path, s3_path, s4_path, s5_path]]
-scm = Scenario.merge_scenarios(sc_list, date_mode=2, time_mode=2, data_mode=2)
+# sc_list = [Scenario(s_path) for s_path in [s1_path, s2_path, s3_path, s4_path, s5_path]]
+# scm = Scenario.merge_scenarios(sc_list, date_mode=2, time_mode=2, data_mode=2)
 
-print(scm)
-print(scm.get_name())
-print(scm.get_timestamp())
-print(scm.get_data())
+# print(scm)
+# print(scm.get_name())
+# print(scm.get_timestamp())
+# print(scm.get_data())
