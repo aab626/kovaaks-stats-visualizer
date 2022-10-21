@@ -1,4 +1,5 @@
 import os
+import webbrowser
 
 import tkinter as tk
 from tkinter import ttk
@@ -16,7 +17,8 @@ KOVAAKS_STATS_FOLDER_PATH = os.path.join('FPSAimTrainer','stats')
 KOVAAKS_PLAYLIST_FOLDER_PATH = os.path.join('FPSAimTrainer','Saved','SaveGames','Playlists')
 
 RESOURCES_FOLDER = os.path.join('.', 'resources')
-BANNER_PATH = os.path.join(RESOURCES_FOLDER, 'banner.png')
+BANNER_REGULAR_PATH = os.path.join(RESOURCES_FOLDER, 'banner_regular.png')
+BANNER_HOVER_PATH = os.path.join(RESOURCES_FOLDER, 'banner_hover.png')
 ICON_ERROR_PATH = os.path.join(RESOURCES_FOLDER, 'icon_error.png')
 
 class AppGUI(tk.Tk):
@@ -30,7 +32,125 @@ class AppGUI(tk.Tk):
 		self.stats_path = os.path.join('')
 		self.playlist_path = os.path.join('')
 
+		self.var_playlists_list = tk.StringVar(value=[])
+		self.scenarios_list = []
+
+		self.banner_regular_img = ImageTk.PhotoImage(Image.open(BANNER_REGULAR_PATH))
+		self.banner_hover_img = ImageTk.PhotoImage(Image.open(BANNER_HOVER_PATH))
+
 	def window_main(self):
+		# main frame
+		content = ttk.Frame(self)
+		content.grid(row=0, column=0, sticky='news', pady=(5,5))
+		content.columnconfigure((0,1), weight=1)
+		content.rowconfigure(0, weight=1)
+
+		# left frame
+		frame_left = ttk.LabelFrame(content, text='Routines')
+		frame_left.grid(row=0, column=0, sticky='news', padx=(5,5))
+		frame_left.columnconfigure((0,1,2), weight=1)
+		frame_left.rowconfigure(0, weight=1, minsize=300)
+		frame_left.rowconfigure(1, weight=0)
+
+		# left frame: playlist listbox
+		playlists_list = ['playlist_'+str(i).zfill(2) for i in range(50)]
+		self.var_playlists_list.set(playlists_list)
+
+		playlist_listbox = tk.Listbox(frame_left, listvariable=self.var_playlists_list)
+		playlist_scroll = ttk.Scrollbar(frame_left, orient=tk.VERTICAL, command=playlist_listbox.yview)
+		playlist_listbox['yscrollcommand'] = playlist_scroll.set
+
+		playlist_listbox.grid(row=0, column=0, columnspan=3, sticky='news')
+		playlist_scroll.grid(row=0, column=2, sticky='nes')
+
+		# left frame: playlist buttons
+		button_create = ttk.Button(frame_left, text='Create')
+		button_reload = ttk.Button(frame_left, text='Reload')
+		button_delete = ttk.Button(frame_left, text='Delete')
+
+		button_create.grid(row=1, column=0, sticky='news', pady=(5, 0))
+		button_reload.grid(row=1, column=1, sticky='news', pady=(5, 0))
+		button_delete.grid(row=1, column=2, sticky='news', pady=(5, 0))
+
+		# left frame: playlist legend 
+		frame_playlist_legend = ttk.LabelFrame(frame_left, text='Routine legend')
+		frame_playlist_legend.grid(row=2, column=0, columnspan=3)
+
+		text1 = '[K]: Imported from KovaaK\'s downloaded routines.\n'
+		text2 = '[S]: Saved by the application.'
+		text_legend = text1 + text2
+		label_legend = ttk.Label(frame_playlist_legend, text=text_legend)
+		label_legend.grid(row=0, column=0)
+
+		# right frame
+		frame_right = ttk.Frame(content)
+		frame_right.grid(row=0, column=1, sticky='news', padx=(5,5))
+		frame_right.columnconfigure(0, weight=1, minsize=400)
+		frame_right.rowconfigure(0, weight=1, minsize=300)
+		frame_right.rowconfigure(1, weight=1)
+
+
+		# right frame: routine info
+		frame_playlist_info = ttk.LabelFrame(frame_right, text='Routine Info')
+		frame_playlist_info.grid(row=0, column=0, sticky='news', pady=(0, 10))
+
+		self.scenarios_list = ['scenario_'+str(i).zfill(2) for i in range(12)]
+
+		i = 0
+		for scenario_name in self.scenarios_list:
+			# label_text = f'{str(i)}: {scenario_name}'
+			ttk.Label(frame_playlist_info, text=f'{str(i)}:').grid(row=i, column=0, sticky='e')
+			ttk.Label(frame_playlist_info, text=scenario_name).grid(row=i, column=1, sticky='w')
+			i += 1
+
+		# right frame: options
+		frame_options = ttk.LabelFrame(frame_right, text='Options')
+		frame_options.grid(row=1, column=0, sticky='news', pady=(0, 10))
+		frame_options.columnconfigure(0, weight=1)
+		# frame_options.rowconfigure((0,1,2,3), weight=0)
+
+		option1_checkbox = ttk.Checkbutton(frame_options, text='Option 1')
+		option2_checkbox = ttk.Checkbutton(frame_options, text='Option 2')
+		option3_checkbox = ttk.Checkbutton(frame_options, text='Option 3')
+
+		option1_checkbox.grid(row=0, column=0, sticky='w')
+		option2_checkbox.grid(row=1, column=0, sticky='w')
+		option3_checkbox.grid(row=2, column=0, sticky='w')
+
+		button_browse_folder = ttk.Button(frame_options, text='Change KovaaK\'s folder')
+		button_browse_folder.grid(row=3, column=0, sticky='ns', pady=(5, 5))
+
+		# right frame: generate button
+		button_generate = ttk.Button(frame_right, text='Generate report')
+		button_generate.grid(row=2, column=0, sticky='news', padx=(50, 50))
+
+		# right frame: banner
+		self.banner_label = ttk.Label(frame_right)
+		self.banner_label.image = self.banner_regular_img
+		self.banner_label.configure(image=self.banner_regular_img)
+		self.banner_label.grid(row=3, column=0, sticky='s', pady=(0, 5))
+
+		self.banner_label.bind('<Enter>', self.event_banner_enter)
+		self.banner_label.bind('<Leave>', self.event_banner_leave)
+		self.banner_label.bind('<Button-1>', self.event_banner_click)
+
+		# make space for banner
+		frame_right.columnconfigure(0, weight=1, minsize=max(250, self.banner_regular_img.width()+5*2))
+
+	def event_banner_enter(self, e):
+		self.banner_label.image = self.banner_hover_img
+		self.banner_label.configure(image=self.banner_hover_img)
+
+	def event_banner_leave(self, e):
+		self.banner_label.image = self.banner_regular_img
+		self.banner_label.configure(image=self.banner_regular_img)
+
+	def event_banner_click(self, e):
+		webbrowser.open('https://github.com/drizak/kovaaks-stats-visualizer', new=2)
+
+
+
+	def old_window_main(self):
 		self.rowconfigure(0, weight=1, minsize=600)
 
 		# main content frame
@@ -164,6 +284,6 @@ class AppGUI(tk.Tk):
 os.chdir('C:\\Users\\a626\\Desktop\\kovaaks-stats-visualizer\\src')
 
 app = AppGUI()
-app.window_noconfig()
-# app.window_main()
+# app.window_noconfig()
+app.window_main()
 app.mainloop()
