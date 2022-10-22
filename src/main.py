@@ -10,3 +10,8 @@ class Main:
 		cfg = configparser.ConfigParser()
 		cfg.read(CONFIG_FILENAME) # might raise NameError if non existant
 		return cfg
+
+	def create_folders(self):
+		# todo create local playlists folder
+		# todo create local reports folder
+		pass
