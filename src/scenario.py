@@ -5,6 +5,35 @@ import statistics
 import ksv_exceptions
 import ksv_utilities
 
+TARGET_KILLS = 'target_kills'
+TARGET_DEATHS = 'target_deaths'
+TARGET_TIMEPLAYED = 'target_time_played'
+TARGET_TIMELEFT = 'target_time_left'
+TARGET_TTK = 'target_ttk'
+TARGET_DMGDONE = 'target_damage_done'
+TARGET_DMGTAKEN = 'target_damage_taken'
+TARGET_HITS = 'target_hits'
+TARGET_MISSES = 'target_misses'
+TARGET_MIDAIRS = 'target_midairs'
+TARGET_DIRECTS = 'target_directs'
+TARGET_DIRECTED = 'target_directed'
+TARGET_RELOADS = 'target_reloads'
+TARGET_DISTANCETRAVELED = 'target_distance_traveled'
+TARGET_MBS_POINTS = 'target_mbs_points'
+TARGET_SCORE = 'target_score'
+TARGET_PAUSES = 'target_pauses'
+TARGET_PAUSEDURATION = 'target_pause_duration'
+TARGET_SHOTS = 'target_shots'
+TARGET_ACCURACY = 'target_accuracy'
+
+TARGETS_AVALIABLE = [
+						TARGET_KILLS, TARGET_DEATHS, TARGET_TIMEPLAYED, TARGET_TIMELEFT, TARGET_TTK, 
+						TARGET_DMGDONE, TARGET_DMGTAKEN, TARGET_HITS, TARGET_MISSES, TARGET_MIDAIRS, 
+						TARGET_DIRECTS, TARGET_DIRECTED, TARGET_RELOADS, TARGET_DISTANCETRAVELED, 
+						TARGET_MBS_POINTS, TARGET_SCORE, TARGET_PAUSES, TARGET_PAUSEDURATION, 
+						TARGET_SHOTS, TARGET_ACCURACY
+					]
+
 # holds the data for a single kovaaks stat file
 class Scenario:
 	def __init__(self, scenario_path = None):
@@ -118,6 +147,51 @@ class Scenario:
 	def get_accuracy(self):
 		return self.get_hits() / self.get_shots()
 
+	def get_data_target(self, target):
+		if target not in TARGETS_AVALIABLE:
+			raise ValueException(f'Invalid Target: {target} @ Scenario.get_data_target')
+
+		if target == TARGET_KILLS:
+			return self.get_kills()
+		elif target == TARGET_DEATHS:
+			return self.get_deaths()
+		elif target == TARGET_TIMEPLAYED:
+			return self.get_time_played()
+		elif target == TARGET_TIMELEFT:
+			return self.get_time_left()
+		elif target == TARGET_TTK:
+			return self.get_ttk()
+		elif target == TARGET_DMGDONE:
+			return self.get_damage_done()
+		elif target == TARGET_DMGTAKEN:
+			return self.get_damage_taken()
+		elif target == TARGET_HITS:
+			return self.get_hits()
+		elif target == TARGET_MISSES:
+			return self.get_misses()
+		elif target == TARGET_MIDAIRS:
+			return self.get_midairs()
+		elif target == TARGET_DIRECTS:
+			return self.get_directs()
+		elif target == TARGET_DIRECTED:
+			return self.get_directed()
+		elif target == TARGET_RELOADS:
+			return self.get_reloads()
+		elif target == TARGET_DISTANCETRAVELED:
+			return self.get_distance_traveled()
+		elif target == TARGET_MBS_POINTS:
+			return self.get_mbs_points()
+		elif target == TARGET_SCORE:
+			return self.get_score()
+		elif target == TARGET_PAUSES:
+			return self.get_pauses()
+		elif target == TARGET_PAUSEDURATION:
+			return self.get_pause_duration()
+		elif target == TARGET_SHOTS:
+			return self.get_shots()
+		elif target == TARGET_ACCURACY:
+			return self.get_accuracy()
+
 	def __str__(self):
 		return f'{self.get_name()} | {self.get_timestamp()}'
 
@@ -201,25 +275,3 @@ class Scenario:
 		merged_scenario.set_data(sce_data)
 
 		return merged_scenario
-
-
-
-# stats_folder = os.path.join('C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer\\FPSAimTrainer\\stats')
-# scenarios = Scenario.list_scenarios(stats_folder)
-
-# s1_path = os.path.join(stats_folder, 'VoxTargetSwitch Click Small - Challenge - 2022.10.19-13.51.05 Stats.csv')
-# s2_path = os.path.join(stats_folder, 'VoxTargetSwitch Click Small - Challenge - 2022.10.19-13.52.18 Stats.csv')
-# s3_path = os.path.join(stats_folder, 'VoxTargetSwitch Click Small - Challenge - 2022.10.19-13.53.23 Stats.csv')
-# s4_path = os.path.join(stats_folder, 'VoxTargetSwitch Click Small - Challenge - 2022.10.19-13.54.28 Stats.csv')
-# s5_path = os.path.join(stats_folder, 'VoxTargetSwitch Click Small - Challenge - 2022.10.19-13.55.33 Stats.csv')
-
-# scen = Scenario(s1_path)
-
-
-# sc_list = [Scenario(s_path) for s_path in [s1_path, s2_path, s3_path, s4_path, s5_path]]
-# scm = Scenario.merge_scenarios(sc_list, date_mode=2, time_mode=2, data_mode=2)
-
-# print(scm)
-# print(scm.get_name())
-# print(scm.get_timestamp())
-# print(scm.get_data())

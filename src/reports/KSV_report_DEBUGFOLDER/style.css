@@ -1,0 +1,179 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+body {
+	background: #342E5C;
+	color: #F1F1F9;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 400;
+}
+
+/* header styling */
+.header{
+	display: flex;
+	flex-flow: column wrap;
+	margin: 0% 25% 0% 25%;
+}
+
+.header > .top{
+	display: flex;
+	flex-flow: column wrap;
+	
+	align-items: center;
+	justify-content: center;
+	
+	margin: 1em 0 1em 0;
+	padding: 0px;
+	
+	color: #F2FF49;
+	font-family: 'Anton', sans-serif;
+}
+
+h1.title{
+	font-size: 5em;
+	margin: 0;
+}
+
+p.author{
+	font-family: 'Anton', sans-serif;
+	margin: 0;
+}
+
+.header > .bottom{
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+	justify-content: center;
+
+	margin: 1% 7.5% 1% 7.5%;
+}
+
+.link-homepage{
+	flex-grow: 1;
+	text-align: left;
+	color: #EC368D;
+}
+
+.link-homepage:hover{
+	color: #47DDFF;
+}
+
+.timestamp{
+	flex-grow: 1;
+	text-align: right;
+}
+
+/* before content styling */
+
+hr.main-sep{
+	border: 3px #47DDFF;
+    border-style: dashed none none none; 
+    margin: 1em 12.5% 1em 12.5%;
+}
+
+div.content {
+	margin: 0 5% 0 5%;
+}
+
+.content > .playlist-name {
+	text-align: center;
+
+	font-family: 'Anton', sans-serif;
+	color: #F2FF49;
+	font-size: 2.25em;
+}
+
+/* scenario styling */
+
+.scenario{
+	display: flex;
+	flex-flow: column nowrap;
+}
+
+.scenario > .title {
+	display: flex;
+	flex-flow: row nowrap;
+
+	font-size: 1.33em;
+	font-weight: 700;
+}
+
+.scenario > .title > .icon {
+	color: #F2FF49;
+	margin: 1% 1em 0.5% 0;
+}
+
+.scenario > .title > .name {
+	color: #EC368D;
+	margin: 1% 0 0.5% 0;
+}
+
+.scenario > .content{
+	display: flex;
+	flex-flow: row nowrap;
+
+	margin: 0;
+}
+
+.scenario > .content > .graph {
+	width: 70%;
+	border: 1px #EC368D solid;
+	border-radius: 1em;
+}
+
+
+.scenario > .content > .data {
+	display: flex;
+	flex-flow: column nowrap;
+	text-align: center;
+	width: 50%;
+}
+
+.scenario > .content > .data > .title{	
+	font-size: 1.25em;
+	/*color: #EC368D;*/
+	margin: 1% auto 1% auto;
+}
+
+.scenario > .content > .data > .data-sep {	
+	border: 2px #EC368D;
+    border-style: dashed none none none; 
+    margin: 1em 12.5% 1em 12.5%;
+}
+
+table.datatable {
+	border-collapse: collapse;
+	margin: 1% 1% 1% 10%;
+}
+
+.datatable .bottomborder{
+	border-bottom: 1px solid #47DDFF;
+}
+
+.datatable .rightborder{
+	border-right: 1px solid #47DDFF;
+}
+
+.datatable .row1 {
+	color: #47DDFF;
+}
+
+.datatable .row1 td{
+	padding-bottom: 1em;
+}
+
+.datatable .category {
+	color: #47DDFF;	
+}
+
+.datatable .value {
+	padding-top: 0.66em;
+}
+
+/* scenario separator styling */
+
+hr.scenario-sep{
+	border: 2px dashed #47DDFF;
+    border-style: dashed none none none; 
+    margin: 1em 12.5% 1em 12.5%;
+}
