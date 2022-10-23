@@ -1,6 +1,6 @@
 import os
-import datetime
 import statistics
+from datetime import datetime
 
 import ksv_exceptions
 import ksv_utilities
@@ -42,7 +42,8 @@ class Scenario:
 
 		self._scenario_path = scenario_path
 		self._name = ''
-		self._timestamp = datetime.datetime.fromtimestamp(os.path.getctime(self._scenario_path))
+		# self._timestamp = datetime.fromtimestamp(os.path.getctime(self._scenario_path))
+		self._timestamp = datetime.strptime(os.path.basename(scenario_path).split(' - Challenge - ')[1], '%Y.%m.%d-%H.%M.%S Stats.csv')
 		self._data = dict()
 
 		block = 0
@@ -247,7 +248,7 @@ class Scenario:
 
 		date = f_date(timestamps).date()
 		time = f_time(timestamps).time()
-		sce_timestamp = datetime.datetime.combine(date, time)
+		sce_timestamp = datetime.combine(date, time)
 
 		# data
 		# data modes:

@@ -13,6 +13,7 @@ from playlist import Playlist
 from playlist import PLAYLIST_SOURCE_LOCAL, PLAYLIST_SOURCE_KOVAAKS
 from ksv_messagebox import KSVMessageBox
 from ksv_confirmbox import KSVConfirmBox
+from ksv_report import Report
 
 KOVAAKS_EXECUTABLE_FNAME = 'FPSAimTrainer.exe'
 KOVAAKS_STATS_FOLDER_SUBPATH = os.path.join('FPSAimTrainer','stats')
@@ -20,6 +21,7 @@ KOVAAKS_PLAYLIST_FOLDER_SUBPATH = os.path.join('FPSAimTrainer','Saved','SaveGame
 LOCAL_PLAYLIST_FOLDER_PATH = os.path.join(os.getcwd(), 'playlists')
 
 RESOURCES_FOLDER = os.path.join(os.getcwd(), 'resources')
+REPORTS_FOLDER = os.path.join(os.getcwd(), 'reports')
 BANNER_REGULAR_PATH = os.path.join(RESOURCES_FOLDER, 'banner_regular.png')
 BANNER_HOVER_PATH = os.path.join(RESOURCES_FOLDER, 'banner_hover.png')
 ICON_ERROR_PATH = os.path.join(RESOURCES_FOLDER, 'icon_error.png')
@@ -135,7 +137,7 @@ class AppGUI(tk.Tk):
 		button_browse_folder.grid(row=3, column=0, sticky='ns', pady=(5, 5))
 
 		# right frame: generate button
-		button_generate = ttk.Button(frame_right, text='Generate report')
+		button_generate = ttk.Button(frame_right, text='Generate report', command=self.command_generate_report)
 		button_generate.grid(row=2, column=0, sticky='news', padx=(50, 50))
 
 		# right frame: banner
@@ -321,6 +323,7 @@ class AppGUI(tk.Tk):
 		i = self.playlist_listbox.curselection()[0]
 		playlist_name = list(self.playlists_dict.keys())[i]
 		self.selected_playlist = self.playlists_dict[playlist_name]
+		print(self.selected_playlist, self.selected_playlist.name, flush=True)
 		self.update_scenarios()
 
 	def event_banner_enter(self, e):
@@ -362,7 +365,14 @@ class AppGUI(tk.Tk):
 						'Error!\nSelect the correct KovaaK\'s folder, it has the FPSAimTrainer executable in it.',
 						ICON_ERROR_PATH)
 
-	
+	def command_generate_report(self):
+		if self.selected_playlist is not None:
+			css_path = os.path.join(RESOURCES_FOLDER, 'report_style.css')
+			report = Report(self.selected_playlist, self.kovaaks_stats_path, REPORTS_FOLDER, css_path)
+			report_path = report.generate_report()
+			webbrowser.open(report_path, new=2)
+		else:
+			self.bell()
 
 
 

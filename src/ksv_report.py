@@ -1,7 +1,6 @@
 import os
 import io
-from datetime import datetime
-from datetime import date
+from datetime import datetime, date, timedelta
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -17,10 +16,11 @@ CHAR_DELTA = '\u0394'
 CHAR_TRIANGLE = '\u2BC8'
 
 class Report:
-	def __init__(self, playlist, kovaaks_stats_folder, reports_folder):
+	def __init__(self, playlist, kovaaks_stats_folder, reports_folder, css_path):
 		self.playlist = playlist
 		self.kovaaks_stats_folder = kovaaks_stats_folder
 		self.reports_folder = reports_folder
+		self.css_path = css_path
 
 	# Loads the stats for a given scenario, up to days_n number of days
 	# if days_n is None, then loads all stats
@@ -109,11 +109,19 @@ class Report:
 
 		fig, ax = plt.subplots(figsize=(10, 5))
 
+		# plot week lines
+		min_x = min(data_x)
+		x = max(data_x) - timedelta(days=7)
+		while x > min_x:
+			ax.axvline(x=x, linestyle=(0, (5,5)), color='gray', alpha=0.3, linewidth=0.75)
+			x = x - timedelta(days=7)
+
+
 		# plot max and min
 		min_y = data_y_values['min']
 		max_y = data_y_values['max']
-		ax.axhline(y=min_y, linestyle=(0, (5,5)), color='#47DDFF', linewidth=0.75, xmin=min(data_x))
-		ax.axhline(y=max_y, linestyle=(0, (5,5)), color='#47DDFF', linewidth=0.75, xmin=min(data_x))
+		ax.axhline(y=min_y, linestyle=(0, (5,5)), color='#47DDFF', alpha=0.5, linewidth=0.75, xmin=min(data_x))
+		ax.axhline(y=max_y, linestyle=(0, (5,5)), color='#47DDFF', alpha=0.5, linewidth=0.75, xmin=min(data_x))
 
 		# plot curves
 		if len(data_x) >= 3:
@@ -178,14 +186,15 @@ class Report:
 
 	def generate_report(self):
 		# report folder creation
-		# report_folder_name = f'KSV_report_{datetime.now().isoformat().replace(":","_")}'
-		report_folder_name = 'KSV_report_DEBUGFOLDER'
+		# debug
+		# report_folder_name = 'KSV_report_DEBUGFOLDER'
+		report_folder_name = f'KSV_report_{datetime.now().isoformat().replace(":","_").replace("T","_")}'
 		resources_folder_name = 'resources'
 
 		report_folder_path = os.path.join(self.reports_folder, report_folder_name)
 		resources_folder_path = os.path.join(self.reports_folder, report_folder_name, resources_folder_name)
-		# os.mkdir(report_folder_path)
-		# os.mkdir(resources_folder_path)
+		os.mkdir(report_folder_path)
+		os.mkdir(resources_folder_path)
 
 		# document creation
 		doc, tag, text = yattag.Doc().tagtext()
@@ -196,7 +205,7 @@ class Report:
 				with tag('title'):
 					text('KovaaK\'s Stat Report')
 
-				doc.stag('link', rel='stylesheet', href='style.css')
+				doc.stag('link', rel='stylesheet', href=self.css_path)
 
 			with tag('body'):
 				with tag('div', klass='header'):
@@ -221,7 +230,7 @@ class Report:
 						text(f'Playlist: {self.playlist.name}')
 
 					i = 0
-					for scenario_name in playlist.scenarios_names:
+					for scenario_name in self.playlist.scenarios_names:
 						with tag('div', klass='scenario'):
 							with tag('div', klass='title'):
 								with tag('p', klass='icon'):
@@ -291,47 +300,27 @@ class Report:
 												with tag('td', klass='value'):
 													text(data_y_avg_values['std'])
 
-						if i != len(playlist.scenarios_names) - 1:
+						if i != len(self.playlist.scenarios_names) - 1:
 							doc.stag('hr', klass='scenario-sep')
 
 						i += 1
 
 		# writing file
+		# debug
 		fname = f'KSV_report.html'
 		fpath = os.path.join(report_folder_path, fname)
 
 		with io.open(fpath, 'w', encoding='utf-8') as fp:
+			# debug
+			# out = doc.getvalue()
 			out = yattag.indent(doc.getvalue())
 			fp.write(out)
-		
-		# # todo
-		# # fname = f'KSV_report_{datetime.now().isoformat().replace(":","_")}.html'
-		# fname = 'report_test.html'
 
-		# fpath = os.path.join(self.reports_folder, fname)
-		# with open(fpath, 'w') as fp:
-		# 	out = yattag.indent(doc.getvalue())
-		# 	fp.write(out)
+		return fpath
 
-		# return fpath
-
-
-
-
-
-stat_path = 'C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer\\FPSAimTrainer\\stats'
-pl_path = 'C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer\\FPSAimTrainer\\Saved\\SaveGames\\Playlists\\Zeeq - Pyth.json'
-rep_folder = 'C:\\Users\\a626\\Desktop\\kovaaks-stats-visualizer\\src\\reports'
-playlist = Playlist.from_kovaaks_json(pl_path)
-rep = Report(playlist, stat_path, rep_folder)
-rep.generate_report()
-
-# for scen_name in playlist.scenarios_names:
-# 	print(scen_name, flush=True)
-# 	scen = rep.load_scenario_stats(scen_name)
-# 	grp = rep.group_sessions(scen, 8)
-
-# 	data = rep.make_plotabble_data(grp, TARGET_SCORE)
-# 	data_avg = rep.make_averaged_data(data[1], 5)
-
-# 	rep.plot(data[0], data[1], data_avg)
+# stat_path = 'C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer\\FPSAimTrainer\\stats'
+# pl_path = 'C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer\\FPSAimTrainer\\Saved\\SaveGames\\Playlists\\Zeeq - Pyth.json'
+# rep_folder = 'C:\\Users\\a626\\Desktop\\kovaaks-stats-visualizer\\src\\reports'
+# playlist = Playlist.from_kovaaks_json(pl_path)
+# rep = Report(playlist, stat_path, rep_folder)
+# rep.generate_report()

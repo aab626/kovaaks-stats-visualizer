@@ -1,0 +1,2 @@
+Stumpy#7423
+might be neat to see stats by sensitivity. Like what sens your best scores are at per scenario
