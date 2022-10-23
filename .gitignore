@@ -136,3 +136,4 @@ pyvenv.cfg
 
 # project
 /mockups
+/src/reports/*
