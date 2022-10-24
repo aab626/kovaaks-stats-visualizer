@@ -323,7 +323,6 @@ class AppGUI(tk.Tk):
 		i = self.playlist_listbox.curselection()[0]
 		playlist_name = list(self.playlists_dict.keys())[i]
 		self.selected_playlist = self.playlists_dict[playlist_name]
-		print(self.selected_playlist, self.selected_playlist.name, flush=True)
 		self.update_scenarios()
 
 	def event_banner_enter(self, e):

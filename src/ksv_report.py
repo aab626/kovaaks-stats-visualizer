@@ -4,7 +4,7 @@ from datetime import datetime, date, timedelta
 
 import numpy as np
 from matplotlib import pyplot as plt
-from scipy.interpolate import make_interp_spline
+from scipy.interpolate import Akima1DInterpolator
 
 import yattag
 
@@ -94,18 +94,19 @@ class Report:
 		return scenarios_merged
 
 	def plot(self, data_x, data_y, data_y_avg, data_y_values, scenario_name, folder_path):
-		if len(data_x) >= 3:
-			# score curve
-			spline_k = 3 if len(data_x) > 3 else 2
+		if len(data_x) >= 2:
+			# smooth x data
 			x_floats = [date.timestamp() for date in data_x]
-			spline_score = make_interp_spline(x_floats, data_y, k=spline_k)
 			x_smooth_floats = np.linspace(x_floats[0], x_floats[-1], 500)
 			x_smooth = [datetime.fromtimestamp(t) for t in x_smooth_floats]
-			y_smooth = spline_score(x_smooth_floats)
+			
+			# score curve
+			interpolated_score = Akima1DInterpolator(x_floats, data_y)
+			y_smooth = interpolated_score(x_smooth_floats)
 
 			# average curve
-			spline_avg = make_interp_spline(x_floats, data_y_avg, k=spline_k)
-			y_smooth_avg = spline_avg(x_smooth_floats)
+			interpolated_avg = Akima1DInterpolator(x_floats, data_y_avg)
+			y_smooth_avg = interpolated_avg(x_smooth_floats)
 
 		fig, ax = plt.subplots(figsize=(10, 5))
 
@@ -124,9 +125,9 @@ class Report:
 		ax.axhline(y=max_y, linestyle=(0, (5,5)), color='#47DDFF', alpha=0.5, linewidth=0.75, xmin=min(data_x))
 
 		# plot curves
-		if len(data_x) >= 3:
-			ax.plot(x_smooth, y_smooth, '-', color='#47DDFF', label='score spline')
-			ax.plot(x_smooth, y_smooth_avg, '--', color='#EC368D', label='avg spline')
+		if len(data_x) >= 2:
+			ax.plot(x_smooth, y_smooth, '-', color='#47DDFF', label='score interp')
+			ax.plot(x_smooth, y_smooth_avg, '--', color='#EC368D', label='avg interp')
 		else:
 			ax.plot(data_x, data_y, '-', color='#47DDFF', label='score line') 
 			ax.plot(data_x, data_y_avg, '--', color='#EC368D', label='avg line') 
@@ -187,7 +188,6 @@ class Report:
 	def generate_report(self):
 		# report folder creation
 		# debug
-		# report_folder_name = 'KSV_report_DEBUGFOLDER'
 		report_folder_name = f'KSV_report_{datetime.now().isoformat().replace(":","_").replace("T","_")}'
 		resources_folder_name = 'resources'
 
@@ -306,21 +306,13 @@ class Report:
 						i += 1
 
 		# writing file
-		# debug
 		fname = f'KSV_report.html'
 		fpath = os.path.join(report_folder_path, fname)
 
 		with io.open(fpath, 'w', encoding='utf-8') as fp:
 			# debug
-			# out = doc.getvalue()
-			out = yattag.indent(doc.getvalue())
+			out = doc.getvalue()
 			fp.write(out)
 
 		return fpath
-
-# stat_path = 'C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer\\FPSAimTrainer\\stats'
-# pl_path = 'C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer\\FPSAimTrainer\\Saved\\SaveGames\\Playlists\\Zeeq - Pyth.json'
-# rep_folder = 'C:\\Users\\a626\\Desktop\\kovaaks-stats-visualizer\\src\\reports'
-# playlist = Playlist.from_kovaaks_json(pl_path)
-# rep = Report(playlist, stat_path, rep_folder)
-# rep.generate_report()
+ 
