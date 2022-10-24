@@ -151,11 +151,12 @@ class Report:
 		yticks.append(np.quantile(data_y, 0.5))
 		yticks.append(np.quantile(data_y, 0.75))
 		yticks.append(max(data_y))
+		yticks = list(set([round(y) for y in yticks]))
 
-		if round(min_y) not in [round(y) for y in yticks]:
+		if round(min_y) not in yticks:
 			yticks.append(min_y)
 
-		if round(max_y) not in [round(y) for y in yticks]:
+		if round(max_y) not in yticks:
 			yticks.append(max_y)
 
 		yticks.sort()
@@ -217,7 +218,7 @@ class Report:
 							text(f'Made by st{CHAR_DELTA}r')
 
 					with tag('div', klass='bottom'):
-						with tag('a', klass='link-homepage', href='https://github.com/drizak/kovaaks-stats-visualizer'):
+						with tag('a', klass='link-homepage', href='https://github.com/drizak/kovaaks-stats-visualizer', target='_blank'):
 							text('GitHub Repository')
 
 						with tag('p', klass='timestamp'):
