@@ -198,11 +198,14 @@ class AppGUI(tk.Tk):
 		search_box = ttk.Entry(frame_left, textvariable=var_search)
 		search_box.grid(row=0, column=0, sticky='news', padx=(2,2), pady=(2, 5))
 
-		f_search = lambda x,y,z: var_avaliable_scenarios.set([s for s in all_scenarios if var_search.get().lower() in s.lower()] if var_search.get()!='' else all_scenarios)
+		all_scenarios = Scenario.list_scenarios(self.kovaaks_stats_path)
+		avaliable_scenarios = all_scenarios.copy()
+		var_avaliable_scenarios = tk.StringVar(value=avaliable_scenarios)
+
+		f_search_results = lambda: [s for s in all_scenarios if var_search.get().lower() in s.lower()] if var_search.get() != '' else all_scenarios
+		f_search = lambda x,y,z: var_avaliable_scenarios.set(f_search_results())
 		var_search.trace_add('write', f_search)
 
-		all_scenarios = Scenario.list_scenarios(self.kovaaks_stats_path)
-		var_avaliable_scenarios = tk.StringVar(value=all_scenarios)
 		listbox_avaliable_scenarios = tk.Listbox(frame_left, listvariable=var_avaliable_scenarios)
 		scrollbar_avaliable_scenarios = ttk.Scrollbar(frame_left, orient=tk.VERTICAL, command=listbox_avaliable_scenarios.yview)
 		listbox_avaliable_scenarios['yscrollcommand'] = scrollbar_avaliable_scenarios.set
@@ -210,7 +213,7 @@ class AppGUI(tk.Tk):
 		scrollbar_avaliable_scenarios.grid(row=1, column=1, sticky='nes')
 
 		f_command_add = lambda: [f_add_to_selected(), f_update_selected_scenarios()]
-		f_add_to_selected = lambda: list_selected_scenarios.append(all_scenarios[listbox_avaliable_scenarios.curselection()[0]])
+		f_add_to_selected = lambda: list_selected_scenarios.append(f_search_results()[listbox_avaliable_scenarios.curselection()[0]])
 		f_update_selected_scenarios = lambda: var_selected_scenarios.set(list_selected_scenarios)
 		button_add = ttk.Button(frame_left, text='Add', command=f_command_add)
 		button_add.grid(row=2, column=0, sticky='ns', padx=(10, 10), pady=(5, 2))

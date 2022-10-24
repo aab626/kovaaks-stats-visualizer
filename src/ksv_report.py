@@ -239,66 +239,77 @@ class Report:
 									text(scenario_name)
 
 							scenarios = self.load_scenario_stats(scenario_name, days_n=30)
-							scenarios_grouped = self.group_sessions(scenarios, hours_n=8)
-							x, data_y_ungrouped = self.make_plottable_data(scenarios, target=TARGET_SCORE)
-							data_y_values = self.get_data_values(data_y_ungrouped)
 
-							data = self.make_plottable_data(scenarios_grouped, target=TARGET_SCORE)
-							data_y_avg = self.make_averaged_data(data[1], average_sessions=5)
-							data_y_avg_ungrouped = self.make_averaged_data(data_y_ungrouped, average_sessions=5)
-							data_y_avg_values = self.get_data_values(data_y_avg_ungrouped)
+							# if there are played scenarios, plot graph
+							if len(scenarios) > 0:
+								scenarios_grouped = self.group_sessions(scenarios, hours_n=8)
+								x, data_y_ungrouped = self.make_plottable_data(scenarios, target=TARGET_SCORE)
+								data_y_values = self.get_data_values(data_y_ungrouped)
 
-							with tag('div', klass='content'):
-								img_path = self.plot(data[0], data[1], data_y_avg, data_y_values, scenario_name, resources_folder_path)
-								doc.stag('img', src=img_path, klass='graph')
+								data = self.make_plottable_data(scenarios_grouped, target=TARGET_SCORE)
+								data_y_avg = self.make_averaged_data(data[1], average_sessions=5)
+								data_y_avg_ungrouped = self.make_averaged_data(data_y_ungrouped, average_sessions=5)
+								data_y_avg_values = self.get_data_values(data_y_avg_ungrouped)
 
-								with tag('div', klass='data'):
-									with tag('h4', klass='title'):
-										text('Ungrouped Stats')
+								with tag('div', klass='content'):
+									img_path = self.plot(data[0], data[1], data_y_avg, data_y_values, scenario_name, resources_folder_path)
+									doc.stag('img', src=img_path, klass='graph')
 
-									doc.stag('hr', klass='data-sep')
+									with tag('div', klass='data'):
+										with tag('h4', klass='title'):
+											text('Ungrouped Stats')
 
-									with tag('table', klass='datatable'):
-										with tag('tbody'):
-											with tag('tr', klass='row1'):
-												with tag('td'):
-													text('')
-												with tag('td', klass='bottomborder'):
-													text('Original')
-												with tag('td', klass='bottomborder'):
-													text('Average')
+										doc.stag('hr', klass='data-sep')
 
-											with tag('tr', klass='row2'):
-												with tag('td', klass='category rightborder'):
-													text('Max')
-												with tag('td', klass='value'):
-													text(data_y_values['max'])
-												with tag('td', klass='value'):
-													text(data_y_avg_values['max'])
+										with tag('table', klass='datatable'):
+											with tag('tbody'):
+												with tag('tr', klass='row1'):
+													with tag('td'):
+														text('')
+													with tag('td', klass='bottomborder'):
+														text('Original')
+													with tag('td', klass='bottomborder'):
+														text('Average')
 
-											with tag('tr', klass='row3'):
-												with tag('td', klass='category rightborder'):
-													text('Min')
-												with tag('td', klass='value'):
-													text(data_y_values['min'])
-												with tag('td', klass='value'):
-													text(data_y_avg_values['min'])
+												with tag('tr', klass='row2'):
+													with tag('td', klass='category rightborder'):
+														text('Max')
+													with tag('td', klass='value'):
+														text(data_y_values['max'])
+													with tag('td', klass='value'):
+														text(data_y_avg_values['max'])
 
-											with tag('tr', klass='row4'):
-												with tag('td', klass='category rightborder'):
-													text('Avg')
-												with tag('td', klass='value'):
-													text(data_y_values['avg'])
-												with tag('td', klass='value'):
-													text(data_y_avg_values['avg'])
+												with tag('tr', klass='row3'):
+													with tag('td', klass='category rightborder'):
+														text('Min')
+													with tag('td', klass='value'):
+														text(data_y_values['min'])
+													with tag('td', klass='value'):
+														text(data_y_avg_values['min'])
 
-											with tag('tr', klass='row5'):
-												with tag('td', klass='category rightborder'):
-													text('StDev')
-												with tag('td', klass='value'):
-													text(data_y_values['std'])
-												with tag('td', klass='value'):
-													text(data_y_avg_values['std'])
+												with tag('tr', klass='row4'):
+													with tag('td', klass='category rightborder'):
+														text('Avg')
+													with tag('td', klass='value'):
+														text(data_y_values['avg'])
+													with tag('td', klass='value'):
+														text(data_y_avg_values['avg'])
+
+												with tag('tr', klass='row5'):
+													with tag('td', klass='category rightborder'):
+														text('StDev')
+													with tag('td', klass='value'):
+														text(data_y_values['std'])
+													with tag('td', klass='value'):
+														text(data_y_avg_values['std'])
+
+							# otherwise, display an alert in the report
+							else:
+								with tag('div', klass='no-scenarios'):
+									with tag('p'):
+										text('No stat files found!')
+
+
 
 						if i != len(self.playlist.scenarios_names) - 1:
 							doc.stag('hr', klass='scenario-sep')

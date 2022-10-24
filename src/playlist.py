@@ -38,6 +38,9 @@ class Playlist:
 	def delete(self):
 		os.remove(self.full_path)
 
+	def __repr__(self):
+		return f'Playlist:{self.name}'
+
 	@staticmethod
 	def from_kovaaks_json(playlist_path):
 		with open(playlist_path, 'r') as fp:

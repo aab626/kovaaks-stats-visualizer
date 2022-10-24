@@ -196,6 +196,9 @@ class Scenario:
 	def __str__(self):
 		return f'{self.get_name()} | {self.get_timestamp()}'
 
+	def __repr__(self):
+		return f'Scenario:{self.get_name()}'
+
 
 	# lists all scenario names in the stat folder
 	@staticmethod

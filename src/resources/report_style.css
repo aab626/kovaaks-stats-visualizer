@@ -170,6 +170,12 @@ table.datatable {
 	padding-top: 0.66em;
 }
 
+/* no scenario stat file found styling */
+div.no-scenarios{
+	text-align: left;
+	margin-left: 2.5em;
+}
+
 /* scenario separator styling */
 
 hr.scenario-sep{
