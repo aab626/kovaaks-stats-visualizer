@@ -2,8 +2,8 @@ import os
 import statistics
 from datetime import datetime
 
-import ksv_exceptions
-import ksv_utilities
+from util.exceptions import DifferentScenariosException, ModeSelectionException
+import util.utilities
 
 TARGET_KILLS = 'target_kills'
 TARGET_DEATHS = 'target_deaths'
@@ -216,7 +216,7 @@ class Scenario:
 		# name
 		names = set([sce.get_name() for sce in scenarios])
 		if len(names) != 1:
-			raise ksv_exceptions.DifferentScenariosException(f'Different scenario names ({len(names)}).')
+			raise DifferentScenariosException(f'Different scenario names ({len(names)}).')
 
 		sce_name = names.pop()
 
@@ -228,7 +228,7 @@ class Scenario:
 		# 1: max timestamp
 		# 2: average timestamps
 		if date_mode is None:
-			raise ksv_exceptions.ModeSelectionException('No date_mode selected')
+			raise ModeSelectionException('No date_mode selected')
 		elif date_mode == 0:
 			f_date = min
 		elif date_mode == 1:
@@ -236,10 +236,10 @@ class Scenario:
 		elif date_mode == 2:
 			f_date = ksv_utilities.avg_datetime
 		else:
-			raise ksv_exceptions.ModeSelectionException(f'Invalid date_mode: {date_mode}')
+			raise ModeSelectionException(f'Invalid date_mode: {date_mode}')
 
 		if time_mode is None:
-			raise ksv_exceptions.ModeSelectionException('No time_mode selected')
+			raise ModeSelectionException('No time_mode selected')
 		elif time_mode == 0:
 			f_time = min		
 		elif time_mode == 1:
@@ -247,7 +247,7 @@ class Scenario:
 		elif time_mode == 2:
 			f_time = ksv_utilities.avg_datetime
 		else:
-			raise ksv_exceptions.ModeSelectionException(f'Invalid time_mode: {time_mode}')
+			raise ModeSelectionException(f'Invalid time_mode: {time_mode}')
 
 		date = f_date(timestamps).date()
 		time = f_time(timestamps).time()
@@ -259,7 +259,7 @@ class Scenario:
 		# 1: max
 		# 2: average (returns float)
 		if data_mode is None:
-			raise ksv_exceptions.ModeSelectionException('No data_mode selected')
+			raise ModeSelectionException('No data_mode selected')
 		if data_mode == 0:
 			f_data = min
 		elif data_mode == 1:

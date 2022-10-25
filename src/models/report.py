@@ -8,9 +8,9 @@ from scipy.interpolate import Akima1DInterpolator
 
 import yattag
 
-from playlist import Playlist
-from scenario import Scenario
-from scenario import TARGET_SCORE
+from models.playlist import Playlist
+from models.scenario import Scenario
+from models.scenario import TARGET_SCORE
 
 CHAR_DELTA = '\u0394'
 CHAR_TRIANGLE = '\u2BC8'

@@ -8,12 +8,12 @@ from tkinter import messagebox
 
 from PIL import Image, ImageTk
 
-from scenario import Scenario
-from playlist import Playlist
-from playlist import PLAYLIST_SOURCE_LOCAL, PLAYLIST_SOURCE_KOVAAKS
-from ksv_messagebox import KSVMessageBox
-from ksv_confirmbox import KSVConfirmBox
-from ksv_report import Report
+from models.scenario import Scenario
+from models.playlist import Playlist
+from models.playlist import PLAYLIST_SOURCE_LOCAL, PLAYLIST_SOURCE_KOVAAKS
+from gui.messagebox import KSVMessageBox
+from gui.confirmbox import KSVConfirmBox
+from models.report import Report
 
 KOVAAKS_EXECUTABLE_FNAME = 'FPSAimTrainer.exe'
 KOVAAKS_STATS_FOLDER_SUBPATH = os.path.join('FPSAimTrainer','stats')
@@ -378,10 +378,10 @@ class AppGUI(tk.Tk):
 
 
 
-os.chdir('C:\\Users\\a626\\Desktop\\kovaaks-stats-visualizer\\src')
+# os.chdir('C:\\Users\\a626\\Desktop\\kovaaks-stats-visualizer\\src')
 
-app = AppGUI('dummy config')
-# app.window_select_folder()
-# app.window_main()
-app.mainloop()
+# app = AppGUI('dummy config')
+# # app.window_select_folder()
+# # app.window_main()
+# app.mainloop()
 
