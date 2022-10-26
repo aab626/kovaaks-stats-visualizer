@@ -138,3 +138,4 @@ pyvenv.cfg
 /mockups
 /src/reports/*
 /src/playlists/*
+/src/config.json

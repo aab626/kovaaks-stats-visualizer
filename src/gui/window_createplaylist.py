@@ -4,20 +4,21 @@ from tkinter import ttk
 from models.scenario import Scenario
 from models.playlist import Playlist
 from models.playlist import PLAYLIST_SOURCE_LOCAL, PLAYLIST_SOURCE_KOVAAKS
+from models.config import Config
+from models.config import PATHKEY_KOVAAKS_STATS, PATHKEY_LOCAL_PLAYLISTS
 
 # window that handles playlist creation
 class CreatePlaylistWindow(tk.Toplevel):
-	def __init__(self, parent, playlists, playlist_folder_path, kovaaks_stats_path):
+	def __init__(self, parent, playlists, cfg: Config):
 		tk.Toplevel.__init__(self)
 		self.title('Playlist Creator')
 		self.grab_set()
 
 		self.parent = parent
 		self.playlists = playlists
-		self.playlist_folder_path = playlist_folder_path
-		self.kovaaks_stats_path = kovaaks_stats_path
+		self.cfg = cfg
 
-		self.all_scenarios = Scenario.list_scenarios(self.kovaaks_stats_path)
+		self.all_scenarios = Scenario.list_scenarios(self.cfg.get_path(PATHKEY_KOVAAKS_STATS))
 		self.avaliable_scenarios = self.all_scenarios.copy()
 		self.selected_scenarios = []
 		
@@ -25,7 +26,6 @@ class CreatePlaylistWindow(tk.Toplevel):
 		self.var_search = tk.StringVar(value='')
 		self.var_playlist_name = tk.StringVar(value='')
 		self.var_selected_scenarios = tk.StringVar(value=self.selected_scenarios)
-
 
 		# declaration for dummy widgets
 		self.listbox_avaliable_scenarios = None
@@ -120,7 +120,7 @@ class CreatePlaylistWindow(tk.Toplevel):
 
 	def f_command_remove(self, *args):
 		i = self.listbox_selected_scenarios.curselection()[0]
-		self.selected_scenarios.pop(self.listbox_selected_scenarios[i])
+		self.selected_scenarios.pop(i)
 		self.var_selected_scenarios.set(self.selected_scenarios)
 
 	def f_command_create(self, *args):
@@ -129,7 +129,7 @@ class CreatePlaylistWindow(tk.Toplevel):
 		c3 = self.var_playlist_name.get() not in [p.name for p in self.playlists]
 		if c1 and c2 and c3:
 			playlist = Playlist(self.var_playlist_name.get(), self.selected_scenarios, PLAYLIST_SOURCE_LOCAL, None)
-			playlist.save_to_local(self.playlist_folder_path) 
+			playlist.save_to_local(self.cfg.get_path(PATHKEY_LOCAL_PLAYLISTS)) 
 			self.destroy()
 		else:
 			self.bell()

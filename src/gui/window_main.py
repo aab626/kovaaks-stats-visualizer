@@ -4,58 +4,45 @@ import webbrowser
 import tkinter as tk
 from tkinter import ttk
 
-from PIL import Image, ImageTk
+from PIL import ImageTk
 
 from models.playlist import Playlist
 from models.playlist import PLAYLIST_SOURCE_LOCAL, PLAYLIST_SOURCE_KOVAAKS
+from models.config import Config
+from models.config import PATHKEY_CSS, PATHKEY_KOVAAKS_PLAYLISTS, PATHKEY_LOCAL_PLAYLISTS, PATHKEY_LOCAL_REPORTS, PATHKEY_LOCAL_RESOURCES
 
 from gui.confirmbox import KSVConfirmBox
 from gui.window_createplaylist import CreatePlaylistWindow
 from gui.window_promptkovaaksfolder import BrowseKovaaksFolder
 from models.report import Report
 
-KOVAAKS_STATS_FOLDER_SUBPATH = os.path.join('FPSAimTrainer','stats')
-KOVAAKS_PLAYLIST_FOLDER_SUBPATH = os.path.join('FPSAimTrainer','Saved','SaveGames','Playlists')
-LOCAL_PLAYLIST_FOLDER_PATH = os.path.join(os.getcwd(), 'playlists')
-
-RESOURCES_FOLDER = os.path.join(os.getcwd(), 'resources')
-REPORTS_FOLDER = os.path.join(os.getcwd(), 'reports')
-BANNER_REGULAR_PATH = os.path.join(RESOURCES_FOLDER, 'banner_regular.png')
-BANNER_HOVER_PATH = os.path.join(RESOURCES_FOLDER, 'banner_hover.png')
-ICON_ERROR_PATH = os.path.join(RESOURCES_FOLDER, 'icon_error.png')
-ICON_QUESTION_PATH = os.path.join(RESOURCES_FOLDER, 'icon_question.png')
+BANNER_REGULAR_FILENAME = 'banner_regular.png'
+BANNER_HOVER_FILENAME = 'banner_hover.png'
+ICON_ERROR_FILENAME = 'icon_error.png'
+ICON_QUESTION_FILENAME = 'icon_question.png'
 
 # main window
 class MainWindow(tk.Tk):
-    def __init__(self, config):
+    def __init__(self, cfg: Config):
         super().__init__()
+
+        self.cfg = cfg
+
+        self.deiconify()
         self.title('KovaaK\'s Stat Visualizer')
         self.columnconfigure(0, weight=1, minsize=0)
         self.rowconfigure(0, weight=1, minsize=0)
-
-        # instance variables
-        self.kovaaks_path = tk.StringVar()
-        self.kovaaks_stats_path = os.path.join('')
-        self.kovaaks_playlist_path = os.path.join('')
 
         self.playlists = []
         self.var_playlists = tk.StringVar(value=[])
         self.selected_playlist = None
 
         self.playlist_listbox = None
-        self.banner_regular_img = ImageTk.PhotoImage(Image.open(BANNER_REGULAR_PATH))
-        self.banner_hover_img = ImageTk.PhotoImage(Image.open(BANNER_HOVER_PATH))
+        self.banner_regular = None
+        self.banner_hover = None
         
-        # todo fix logic: usage with main.py
-        # config loading
-        if config is None:
-            self.window_select_folder()
-        else:
-            self.load_gui_config(config)
-
-        # initialization methods
-        if config is not None:
-            self.create_widgets()
+        # widget init
+        self.create_widgets()
 
     # main application window
     def create_widgets(self):
@@ -139,8 +126,9 @@ class MainWindow(tk.Tk):
 
         # right frame: banner
         self.banner_label = ttk.Label(frame_right, cursor='hand2')
-        self.banner_label.image = self.banner_regular_img
-        self.banner_label.configure(image=self.banner_regular_img)
+        self.banner_regular = ImageTk.PhotoImage(master=self.banner_label, file=os.path.join(self.cfg.get_path(PATHKEY_LOCAL_RESOURCES), BANNER_REGULAR_FILENAME))
+        self.banner_hover = ImageTk.PhotoImage(master=self.banner_label, file=os.path.join(self.cfg.get_path(PATHKEY_LOCAL_RESOURCES), BANNER_HOVER_FILENAME))
+        self.banner_label.configure(image=self.banner_regular)
         self.banner_label.grid(row=3, column=0, sticky='s', pady=(0, 5))
 
         self.banner_label.bind('<Enter>', self.event_banner_enter)
@@ -148,14 +136,7 @@ class MainWindow(tk.Tk):
         self.banner_label.bind('<Button-1>', self.event_banner_click)
 
         # make space for banner
-        frame_right.columnconfigure(0, weight=1, minsize=max(250, self.banner_regular_img.width()+5*2))	
-
-    # methods
-    def load_gui_config(self, config):
-        # todo fix, temporary
-        self.kovaaks_path.set('C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer')
-        self.kovaaks_stats_path = os.path.join(self.kovaaks_path.get(), KOVAAKS_STATS_FOLDER_SUBPATH)
-        self.kovaaks_playlist_path = os.path.join(self.kovaaks_path.get(), KOVAAKS_PLAYLIST_FOLDER_SUBPATH)
+        frame_right.columnconfigure(0, weight=1, minsize=max(250, self.banner_regular.width()+5*2))	
                                                                      
     def update_scenarios(self):
         for wchild in self.frame_playlist_info.winfo_children():
@@ -169,12 +150,12 @@ class MainWindow(tk.Tk):
 
     # commands
     def command_create_playlist(self, *args):
-        window = CreatePlaylistWindow(self, self.playlists, LOCAL_PLAYLIST_FOLDER_PATH, self.kovaaks_stats_path)
+        window = CreatePlaylistWindow(self, self.playlists, self.cfg)
         window.mainloop()
 
     def command_reload_playlists(self, *args):
-        kovaaks_playlists = Playlist.get_kovaaks_playlists(self.kovaaks_playlist_path)
-        local_playlists = Playlist.get_local_playlists(LOCAL_PLAYLIST_FOLDER_PATH)
+        kovaaks_playlists = Playlist.get_kovaaks_playlists(self.cfg.get_path(PATHKEY_KOVAAKS_PLAYLISTS))
+        local_playlists = Playlist.get_local_playlists(self.cfg.get_path(PATHKEY_LOCAL_PLAYLISTS))
         self.playlists = kovaaks_playlists + local_playlists
         self.playlists.sort(key=lambda p: p.name)
 
@@ -185,12 +166,17 @@ class MainWindow(tk.Tk):
         if self.selected_playlist.source == PLAYLIST_SOURCE_KOVAAKS:
             self.bell()
         else:
-            KSVConfirmBox(	self,
-                            'Confirm playlist deletion', 
-                            f'About to delete: {self.selected_playlist.name}\nThis operation cannot be undone.',
-                            ICON_QUESTION_PATH,
-                            'Delete', self.command_delete_playlist,
-                            'Cancel')
+            # todo fix icon path to icon
+            KSVConfirmBox(
+                parent      =   self,
+                title       =   'Confirm playlist deletion',
+                message     =   f'About to delete: {self.selected_playlist.name}\nThis operation cannot be undone.',
+                icon_path   =   os.path.join(self.cfg.get_path(PATHKEY_LOCAL_RESOURCES), ICON_QUESTION_FILENAME),
+                text_option1=   'Delete',
+                f_option1   =   self.command_delete_playlist,
+                text_option2=   'Cancel',
+                f_option2   =   None
+            )
 
     def command_delete_playlist(self, *args):
         i = self.playlist_listbox.curselection()[0]
@@ -204,14 +190,16 @@ class MainWindow(tk.Tk):
             self.bell()
 
     def command_browse_kovaaks_folder(self, *args):
-        window = BrowseKovaaksFolder(self.kovaaks_path, ICON_ERROR_PATH)
+        icon_error_path = os.path.join(self.cfg.get_path(PATHKEY_LOCAL_RESOURCES), ICON_ERROR_FILENAME)
+        window = BrowseKovaaksFolder(self.cfg, icon_error_path)
         window.mainloop()
 
     def command_generate_report(self, *args):
         if self.selected_playlist is not None:
-            css_path = os.path.join(RESOURCES_FOLDER, 'report_style.css')
-            report = Report(self.selected_playlist, self.kovaaks_stats_path, REPORTS_FOLDER, css_path)
-            report_path = report.generate_report()
+            # todo fix using cfg
+            report = Report(self.selected_playlist, self.cfg)
+            report_content = report.generate_report()
+            report_path = report.write_report(report_content)
             webbrowser.open(report_path, new=2)
         else:
             self.bell()
@@ -223,12 +211,12 @@ class MainWindow(tk.Tk):
         self.update_scenarios()
 
     def event_banner_enter(self, *args):
-        self.banner_label.image = self.banner_hover_img
-        self.banner_label.configure(image=self.banner_hover_img)
+        self.banner_label.image = self.banner_hover
+        self.banner_label.configure(image=self.banner_hover)
 
     def event_banner_leave(self, *args):
-        self.banner_label.image = self.banner_regular_img
-        self.banner_label.configure(image=self.banner_regular_img)
+        self.banner_label.image = self.banner_regular
+        self.banner_label.configure(image=self.banner_regular)
 
     def event_banner_click(self, *args):
         webbrowser.open('https://github.com/drizak/kovaaks-stats-visualizer', new=2)

@@ -61,7 +61,6 @@ class Playlist:
 
 	@staticmethod
 	def get_kovaaks_playlists(kovaaks_playlists_path):
-		print(kovaaks_playlists_path, flush=True)
 		jsons = [f for f in os.listdir(kovaaks_playlists_path) if os.path.splitext(f)[1].lower() == '.json']
 		playlists = [Playlist.from_kovaaks_json(os.path.join(kovaaks_playlists_path, f)) for f in jsons]
 		return playlists

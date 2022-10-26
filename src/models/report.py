@@ -11,23 +11,30 @@ import yattag
 from models.playlist import Playlist
 from models.scenario import Scenario
 from models.scenario import TARGET_SCORE
+import models.config as ckeys
+from models.config import Config
 
 CHAR_DELTA = '\u0394'
 CHAR_TRIANGLE = '\u2BC8'
 
+REPORT_RESOURCES_FOLDERNAME = 'report_resources'
+REPORT_FILENAME = 'KSV_report.html'
+
+# todo add use config
 class Report:
-	def __init__(self, playlist, kovaaks_stats_folder, reports_folder, css_path):
+	def __init__(self, playlist, cfg: Config):
 		self.playlist = playlist
-		self.kovaaks_stats_folder = kovaaks_stats_folder
-		self.reports_folder = reports_folder
-		self.css_path = css_path
+		self.cfg = cfg
+
+		self.report_folder_path = None
+		self.resources_folder_path = None
 
 	# Loads the stats for a given scenario, up to days_n number of days
 	# if days_n is None, then loads all stats
 	def load_scenario_stats(self, scenario_name, days_n = None):
 		scenarios = []
-		for fname in os.listdir(self.kovaaks_stats_folder):
-			scen_path = os.path.join(self.kovaaks_stats_folder, fname)
+		for fname in os.listdir(self.cfg.get_path(ckeys.PATHKEY_KOVAAKS_STATS)):
+			scen_path = os.path.join(self.cfg.get_path(ckeys.PATHKEY_KOVAAKS_STATS), fname)
 			scen = Scenario(scen_path)
 
 			if scen.get_name() == scenario_name:
@@ -93,6 +100,7 @@ class Report:
 
 		return scenarios_merged
 
+	# todo add percentage diff values over score/avg curves
 	def plot(self, data_x, data_y, data_y_avg, data_y_values, scenario_name, folder_path):
 		if len(data_x) >= 2:
 			# smooth x data
@@ -114,27 +122,27 @@ class Report:
 		min_x = min(data_x)
 		x = max(data_x) - timedelta(days=7)
 		while x > min_x:
-			ax.axvline(x=x, linestyle=(0, (5,5)), color='gray', alpha=0.3, linewidth=0.75)
+			ax.axvline(x=x, linestyle=(0, (5, 5)), color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_WEEKLINE), alpha=0.3, linewidth=0.75)
 			x = x - timedelta(days=7)
 
 
 		# plot max and min
 		min_y = data_y_values['min']
 		max_y = data_y_values['max']
-		ax.axhline(y=min_y, linestyle=(0, (5,5)), color='#47DDFF', alpha=0.5, linewidth=0.75, xmin=min(data_x))
-		ax.axhline(y=max_y, linestyle=(0, (5,5)), color='#47DDFF', alpha=0.5, linewidth=0.75, xmin=min(data_x))
+		ax.axhline(y=min_y, linestyle=(0, (5, 5)), color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_MIN), alpha=0.5, linewidth=0.75, xmin=min(data_x))
+		ax.axhline(y=max_y, linestyle=(0, (5, 5)), color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_MAX), alpha=0.5, linewidth=0.75, xmin=min(data_x))
 
 		# plot curves
 		if len(data_x) >= 2:
-			ax.plot(x_smooth, y_smooth, '-', color='#47DDFF', label='score interp')
-			ax.plot(x_smooth, y_smooth_avg, '--', color='#EC368D', label='avg interp')
+			ax.plot(x_smooth, y_smooth, '-', color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_SCORECURVE))
+			ax.plot(x_smooth, y_smooth_avg, '--', color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_AVERAGECURVE))
 		else:
-			ax.plot(data_x, data_y, '-', color='#47DDFF', label='score line') 
-			ax.plot(data_x, data_y_avg, '--', color='#EC368D', label='avg line') 
+			ax.plot(data_x, data_y, '-', color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_SCORECURVE))
+			ax.plot(data_x, data_y_avg, '--', color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_AVERAGECURVE))
 
 		# plot points
-		ax.plot(data_x, data_y, 'o', color='#4781ff', label='score')
-		ax.plot(data_x, data_y_avg, 'o', color='#F2FF49', label='avg')
+		ax.plot(data_x, data_y, 'o', color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_SCOREDATA), label='score')
+		ax.plot(data_x, data_y_avg, 'o', color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_AVERAGEDATA), label='avg')
 
 		# ticks
 		xticks = []
@@ -164,18 +172,18 @@ class Report:
 
 		ax.set_xticks(xticks)
 		ax.set_xticklabels(xticks_str)
-		ax.tick_params(axis='x', labelsize=7, color='#47DDFF', labelcolor='#F1F1F9')
+		ax.tick_params(axis='x', labelsize=7, color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_XTICKS), labelcolor=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_XTICKSLABELS))
 
 		ax.set_yticks(yticks)
 		ax.set_yticklabels(yticks_str)
-		ax.tick_params(axis='y', labelsize=7, color='#47DDFF', labelcolor='#F1F1F9')
+		ax.tick_params(axis='y', labelsize=7, color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_YTICKS), labelcolor=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_YTICKSLABELS))
 
 		# borders
 		ax.spines['top'].set_visible(False)
 		ax.spines['right'].set_visible(False)
 
-		ax.spines['left'].set_color('#47DDFF')
-		ax.spines['bottom'].set_color('#47DDFF')
+		ax.spines['left'].set_color(self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_BORDERLEFT))
+		ax.spines['bottom'].set_color(self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_BORDERBOTTOM))
 
 		# layout
 		fig.tight_layout()
@@ -186,17 +194,10 @@ class Report:
 
 		return fpath
 
+	# returns the body of the report html file
 	def generate_report(self):
-		# report folder creation
-		# debug
-		report_folder_name = f'KSV_report_{datetime.now().isoformat().replace(":","_").replace("T","_")}'
-		resources_folder_name = 'resources'
-
-		report_folder_path = os.path.join(self.reports_folder, report_folder_name)
-		resources_folder_path = os.path.join(self.reports_folder, report_folder_name, resources_folder_name)
-		os.mkdir(report_folder_path)
-		os.mkdir(resources_folder_path)
-
+		folders = self.create_folders()
+		
 		# document creation
 		doc, tag, text = yattag.Doc().tagtext()
 
@@ -206,7 +207,7 @@ class Report:
 				with tag('title'):
 					text('KovaaK\'s Stat Report')
 
-				doc.stag('link', rel='stylesheet', href=self.css_path)
+				doc.stag('link', rel='stylesheet', href=self.cfg.get_path(ckeys.PATHKEY_CSS))
 
 			with tag('body'):
 				with tag('div', klass='header'):
@@ -253,7 +254,7 @@ class Report:
 								data_y_avg_values = self.get_data_values(data_y_avg_ungrouped)
 
 								with tag('div', klass='content'):
-									img_path = self.plot(data[0], data[1], data_y_avg, data_y_values, scenario_name, resources_folder_path)
+									img_path = self.plot(data[0], data[1], data_y_avg, data_y_values, scenario_name, self.resources_folder_path)
 									doc.stag('img', src=img_path, klass='graph')
 
 									with tag('div', klass='data'):
@@ -317,14 +318,20 @@ class Report:
 
 						i += 1
 
-		# writing file
-		fname = f'KSV_report.html'
-		fpath = os.path.join(report_folder_path, fname)
+		return doc.getvalue()
 
+	def create_folders(self):
+		report_folder_name = f'KSV_report_{datetime.now().isoformat().replace(":","_").replace("T","_")}'
+		self.report_folder_path = os.path.join(self.cfg.get_path(ckeys.PATHKEY_LOCAL_REPORTS), report_folder_name)
+		self.resources_folder_path = os.path.join(self.cfg.get_path(ckeys.PATHKEY_LOCAL_REPORTS), report_folder_name, REPORT_RESOURCES_FOLDERNAME)
+
+		os.mkdir(self.report_folder_path)
+		os.mkdir(self.resources_folder_path)
+
+	def write_report(self, report_content):
+		fpath = os.path.join(self.report_folder_path, REPORT_FILENAME)
 		with io.open(fpath, 'w', encoding='utf-8') as fp:
-			# debug
-			out = doc.getvalue()
-			fp.write(out)
+			fp.write(report_content)
 
 		return fpath
  

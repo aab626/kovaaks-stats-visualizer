@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from PIL import ImageTk, Image
+from PIL import ImageTk
 
 # custom messagebox with two buttons
 class KSVConfirmBox(tk.Toplevel):
@@ -16,16 +16,15 @@ class KSVConfirmBox(tk.Toplevel):
 		# self.bell()
 		self.bind("<Destroy>", lambda e:self.parent.attributes('-disabled', False))
 
-		icon = ImageTk.PhotoImage(Image.open(icon_path))
-
 		content = ttk.Frame(self, padding=5)
 		content.grid(row=0, column=0, sticky='news')
 		content.columnconfigure(0, weight=1)
 		content.rowconfigure((0,1,2), weight=1)
 
 		icon_label = ttk.Label(content)
-		icon_label.image = icon
-		icon_label.configure(image=icon)
+		icon_img = ImageTk.PhotoImage(master=icon_label, file=icon_path)
+		icon_label.image = icon_img
+		icon_label.configure(image=icon_img)
 		icon_label.grid(row=0, column=0, rowspan=3, sticky='w', padx=(0, 20))
 
 		text_label = ttk.Label(content, text=message)
