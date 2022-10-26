@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from PIL import ImageTk, Image
 
-# custom messagebox for the app
+# custom messagebox, can be used with an icon
 class KSVMessageBox(tk.Toplevel):
 	def __init__(self, parent, title, message, icon_path = None):
 		tk.Toplevel.__init__(self)

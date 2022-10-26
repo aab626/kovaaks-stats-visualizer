@@ -6,7 +6,6 @@ from tkinter import ttk
 
 from PIL import Image, ImageTk
 
-from models.scenario import Scenario
 from models.playlist import Playlist
 from models.playlist import PLAYLIST_SOURCE_LOCAL, PLAYLIST_SOURCE_KOVAAKS
 
@@ -26,7 +25,8 @@ BANNER_HOVER_PATH = os.path.join(RESOURCES_FOLDER, 'banner_hover.png')
 ICON_ERROR_PATH = os.path.join(RESOURCES_FOLDER, 'icon_error.png')
 ICON_QUESTION_PATH = os.path.join(RESOURCES_FOLDER, 'icon_question.png')
 
-class AppGUI(tk.Tk):
+# main window
+class MainWindow(tk.Tk):
     def __init__(self, config):
         super().__init__()
         self.title('KovaaK\'s Stat Visualizer')
@@ -38,15 +38,13 @@ class AppGUI(tk.Tk):
         self.kovaaks_stats_path = os.path.join('')
         self.kovaaks_playlist_path = os.path.join('')
 
-        self.playlists_dict = dict()
-        self.var_playlists_list = tk.StringVar(value=[])
+        self.playlists = []
+        self.var_playlists = tk.StringVar(value=[])
         self.selected_playlist = None
 
         self.playlist_listbox = None
         self.banner_regular_img = ImageTk.PhotoImage(Image.open(BANNER_REGULAR_PATH))
         self.banner_hover_img = ImageTk.PhotoImage(Image.open(BANNER_HOVER_PATH))
-
-        self.created_playlist = None
         
         # todo fix logic: usage with main.py
         # config loading
@@ -76,7 +74,7 @@ class AppGUI(tk.Tk):
 
         # left frame: playlist listbox
         self.command_reload_playlists()
-        self.playlist_listbox = tk.Listbox(frame_left, listvariable=self.var_playlists_list)
+        self.playlist_listbox = tk.Listbox(frame_left, listvariable=self.var_playlists)
         playlist_scroll = ttk.Scrollbar(frame_left, orient=tk.VERTICAL, command=self.playlist_listbox.yview)
         self.playlist_listbox['yscrollcommand'] = playlist_scroll.set
         self.playlist_listbox.bind('<<ListboxSelect>>', self.event_listbox_playlist_selection)
@@ -158,7 +156,7 @@ class AppGUI(tk.Tk):
         self.kovaaks_path.set('C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer')
         self.kovaaks_stats_path = os.path.join(self.kovaaks_path.get(), KOVAAKS_STATS_FOLDER_SUBPATH)
         self.kovaaks_playlist_path = os.path.join(self.kovaaks_path.get(), KOVAAKS_PLAYLIST_FOLDER_SUBPATH)
-
+                                                                     
     def update_scenarios(self):
         for wchild in self.frame_playlist_info.winfo_children():
             wchild.destroy()
@@ -171,17 +169,17 @@ class AppGUI(tk.Tk):
 
     # commands
     def command_create_playlist(self, *args):
-        window = CreatePlaylistWindow(self, self.playlists_dict, LOCAL_PLAYLIST_FOLDER_PATH, self.kovaaks_stats_path)
+        window = CreatePlaylistWindow(self, self.playlists, LOCAL_PLAYLIST_FOLDER_PATH, self.kovaaks_stats_path)
         window.mainloop()
 
     def command_reload_playlists(self, *args):
         kovaaks_playlists = Playlist.get_kovaaks_playlists(self.kovaaks_playlist_path)
         local_playlists = Playlist.get_local_playlists(LOCAL_PLAYLIST_FOLDER_PATH)
-        playlists = kovaaks_playlists + local_playlists
-        playlists.sort(key=lambda p: p.name)
+        self.playlists = kovaaks_playlists + local_playlists
+        self.playlists.sort(key=lambda p: p.name)
 
-        self.playlists_dict = {pl.name: pl for pl in playlists}
-        self.var_playlists_list.set([pl.get_listname() for pl in playlists])
+        playlists_names = [p.get_listname() for p in self.playlists]
+        self.var_playlists.set(playlists_names)
 
     def command_confirm_playlist_deletion(self, *args):
         if self.selected_playlist.source == PLAYLIST_SOURCE_KOVAAKS:
@@ -196,13 +194,14 @@ class AppGUI(tk.Tk):
 
     def command_delete_playlist(self, *args):
         i = self.playlist_listbox.curselection()[0]
-        playlist_name = list(self.playlists_dict.keys())[i]
-        self.selected_playlist = self.playlists_dict[playlist_name]
+        self.selected_playlist = self.playlists[i]
 
         if self.selected_playlist.source == PLAYLIST_SOURCE_LOCAL:
             self.selected_playlist.delete()
             self.command_reload_playlists()
             self.update_scenarios()
+        else:
+            self.bell()
 
     def command_browse_kovaaks_folder(self, *args):
         window = BrowseKovaaksFolder(self.kovaaks_path, ICON_ERROR_PATH)
@@ -220,8 +219,7 @@ class AppGUI(tk.Tk):
     # events
     def event_listbox_playlist_selection(self, *args):
         i = self.playlist_listbox.curselection()[0]
-        playlist_name = list(self.playlists_dict.keys())[i]
-        self.selected_playlist = self.playlists_dict[playlist_name]
+        self.selected_playlist = self.playlists[i]
         self.update_scenarios()
 
     def event_banner_enter(self, *args):
@@ -242,5 +240,3 @@ class AppGUI(tk.Tk):
 # # app.window_select_folder()
 # # app.window_main()
 # app.mainloop()
-
-# TODO fix playlist listbox issues when selecting after creating a playlist

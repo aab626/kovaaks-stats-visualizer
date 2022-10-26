@@ -5,14 +5,15 @@ from models.scenario import Scenario
 from models.playlist import Playlist
 from models.playlist import PLAYLIST_SOURCE_LOCAL, PLAYLIST_SOURCE_KOVAAKS
 
+# window that handles playlist creation
 class CreatePlaylistWindow(tk.Toplevel):
-	def __init__(self, parent, playlist_dict, playlist_folder_path, kovaaks_stats_path):
+	def __init__(self, parent, playlists, playlist_folder_path, kovaaks_stats_path):
 		tk.Toplevel.__init__(self)
 		self.title('Playlist Creator')
 		self.grab_set()
 
 		self.parent = parent
-		self.playlist_dict = playlist_dict
+		self.playlists = playlists
 		self.playlist_folder_path = playlist_folder_path
 		self.kovaaks_stats_path = kovaaks_stats_path
 
@@ -125,7 +126,7 @@ class CreatePlaylistWindow(tk.Toplevel):
 	def f_command_create(self, *args):
 		c1 = self.var_playlist_name.get() != ''
 		c2 = len(self.selected_scenarios) > 0
-		c3 = self.var_playlist_name.get() not in self.playlist_dict.keys()
+		c3 = self.var_playlist_name.get() not in [p.name for p in self.playlists]
 		if c1 and c2 and c3:
 			playlist = Playlist(self.var_playlist_name.get(), self.selected_scenarios, PLAYLIST_SOURCE_LOCAL, None)
 			playlist.save_to_local(self.playlist_folder_path) 

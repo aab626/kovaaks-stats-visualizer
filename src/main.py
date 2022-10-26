@@ -17,6 +17,7 @@
 # 		pass
 
 import gui.window_main as window_main
+# TODO everything in this file lol
 
 import os
 os.chdir('C:\\Users\\a626\\Desktop\\kovaaks-stats-visualizer\\src')

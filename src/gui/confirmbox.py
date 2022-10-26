@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from PIL import ImageTk, Image
 
-# custom messagebox for the app
+# custom messagebox with two buttons
 class KSVConfirmBox(tk.Toplevel):
 	def __init__(self, parent, title, message, icon_path, text_option1, f_option1, text_option2, f_option2 = None):
 		tk.Toplevel.__init__(self)
