@@ -16,12 +16,16 @@
 # 		# todo create local reports folder
 # 		pass
 
-import gui.mainwindow as mainwindow
+import gui.window_main as window_main
 
 import os
 os.chdir('C:\\Users\\a626\\Desktop\\kovaaks-stats-visualizer\\src')
 
-app = mainwindow.AppGUI('dummy config')
-# app.window_select_folder()
-# app.window_main()
+playlists = os.path.join(os.getcwd(), 'playlists')
+kovaaks = 'C:\\Program Files (x86)\\Steam\\steamapps\\common\\FPSAimTrainer'
+stats = os.path.join(kovaaks, 'FPSAimTrainer', 'stats')
+
+app = window_main.AppGUI('dummy config')
 app.mainloop()
+
+# a = createplaylistwindow.CreatePlaylistWindow({'name1': None, 'name2': None}, playlists, stats)
