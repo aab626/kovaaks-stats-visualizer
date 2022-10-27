@@ -32,9 +32,15 @@ GRAPHKEY_COLOR_YTICKSLABELS = 'color:ytickslabels'
 GRAPHKEY_COLOR_BORDERLEFT = 'color:border_left'
 GRAPHKEY_COLOR_BORDERBOTTOM = 'color:border_bottom'
 
+CSSKEY_COLOR_BACKGROUND = 'color:background'
+CSSKEY_COLOR_TEXT = 'color:text'
+CSSKEY_COLOR_TITLES = 'color:titles'
+CSSKEY_COLOR_MAIN = 'color:main'
+CSSKEY_COLOR_SECONDARY = 'color:secondary'
+
 KOVAAKS_STATS_SUBPATH = os.path.join('FPSAimTrainer', 'stats')
 KOVAAKS_PLAYLISTS_SUBPATH = os.path.join('FPSAimTrainer', 'Saved', 'SaveGames', 'Playlists')
-LOCAL_STYLE_SUBPATH = os.path.join('report_style.css')
+LOCAL_STYLE_SUBPATH = os.path.join('style_template.css')
 
 class Config:
     def __init__(self, cfg_path):
@@ -85,11 +91,11 @@ class Config:
         self.get_data()[SECTION_CSS] = dict()
         css = self.get_data()[SECTION_CSS]
 
-        css['color:background'] = '#342E5C'
-        css['color:text'] = '#F1F1F9'
-        css['color:titles'] = '#F2FF49'
-        css['color:main'] = '#47DDFF'
-        css['color:secondary'] = '#EC368D'
+        css[CSSKEY_COLOR_BACKGROUND] = '#342E5C'
+        css[CSSKEY_COLOR_TEXT] = '#F1F1F9'
+        css[CSSKEY_COLOR_TITLES] = '#F2FF49'
+        css[CSSKEY_COLOR_MAIN] = '#47DDFF'
+        css[CSSKEY_COLOR_SECONDARY] = '#EC368D'
 
         # graphs
         self.get_data()[SECTION_GRAPHS] = dict()
@@ -152,6 +158,12 @@ class Config:
 
         return graphs[graph_key]
 
+    def get_css(self, css_key):
+        css = self.get_data()[SECTION_CSS]
+        if css_key not in css:
+            raise KeyError(f'Invalid config graph key: {css_key}')
+
+        return css[css_key]
 
     # todo add logic for option saving, use key format type:varname for type casting
     def set_option(self, option_key, value):

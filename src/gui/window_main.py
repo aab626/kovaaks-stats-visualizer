@@ -105,6 +105,7 @@ class MainWindow(tk.Tk):
         # self.update_scenarios()
 
         # right frame: options
+        # todo implement options
         frame_options = ttk.LabelFrame(frame_right, text='Options')
         frame_options.grid(row=1, column=0, sticky='news', pady=(0, 10))
         frame_options.columnconfigure(0, weight=1)
@@ -166,7 +167,6 @@ class MainWindow(tk.Tk):
         if self.selected_playlist.source == PLAYLIST_SOURCE_KOVAAKS:
             self.bell()
         else:
-            # todo fix icon path to icon
             KSVConfirmBox(
                 parent      =   self,
                 title       =   'Confirm playlist deletion',
@@ -196,10 +196,13 @@ class MainWindow(tk.Tk):
 
     def command_generate_report(self, *args):
         if self.selected_playlist is not None:
-            # todo fix using cfg
             report = Report(self.selected_playlist, self.cfg)
             report_content = report.generate_report()
             report_path = report.write_report(report_content)
+
+            css_content = report.generate_css()
+            report.write_css(css_content)
+
             webbrowser.open(report_path, new=2)
         else:
             self.bell()
@@ -220,11 +223,3 @@ class MainWindow(tk.Tk):
 
     def event_banner_click(self, *args):
         webbrowser.open('https://github.com/drizak/kovaaks-stats-visualizer', new=2)
-
-
-# os.chdir('C:\\Users\\a626\\Desktop\\kovaaks-stats-visualizer\\src')
-
-# app = AppGUI('dummy config')
-# # app.window_select_folder()
-# # app.window_main()
-# app.mainloop()

@@ -1,11 +1,17 @@
-/* todo this file should be dynamically created using the config */
-
 @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
+:root {
+--color-bg: $REPLACEME$COLOR-BG$REPLACEME$;
+--color-text: $REPLACEME$COLOR-TEXT$REPLACEME$;
+--color-titles: $REPLACEME$COLOR-TITLES$REPLACEME$;
+--color-main: $REPLACEME$COLOR-MAIN$REPLACEME$;
+--color-secondary: $REPLACEME$COLOR-SECONDARY$REPLACEME$;
+}
+
 body {
-	background: #342E5C;
-	color: #F1F1F9;
+	background: var(--color-bg);
+	color: var(--color-text);
 	font-family: 'Roboto', sans-serif;
 	font-weight: 400;
 }
@@ -27,7 +33,7 @@ body {
 	margin: 1em 0 1em 0;
 	padding: 0px;
 	
-	color: #F2FF49;
+	color: var(--color-titles);
 	font-family: 'Anton', sans-serif;
 }
 
@@ -53,11 +59,11 @@ p.author{
 .link-homepage{
 	flex-grow: 1;
 	text-align: left;
-	color: #EC368D;
+	color: var(--color-secondary);
 }
 
 .link-homepage:hover{
-	color: #47DDFF;
+	color: var(--color-main	);
 }
 
 .timestamp{
@@ -68,7 +74,7 @@ p.author{
 /* before content styling */
 
 hr.main-sep{
-	border: 3px #47DDFF;
+	border: 3px var(--color-main);
     border-style: dashed none none none; 
     margin: 1em 12.5% 1em 12.5%;
 }
@@ -81,7 +87,7 @@ div.content {
 	text-align: center;
 
 	font-family: 'Anton', sans-serif;
-	color: #F2FF49;
+	color: var(--color-titles);
 	font-size: 2.25em;
 }
 
@@ -101,12 +107,12 @@ div.content {
 }
 
 .scenario > .title > .icon {
-	color: #F2FF49;
+	color: var(--color-titles);
 	margin: 1% 1em 0.5% 0;
 }
 
 .scenario > .title > .name {
-	color: #EC368D;
+	color: var(--color-secondary);
 	margin: 1% 0 0.5% 0;
 }
 
@@ -119,7 +125,7 @@ div.content {
 
 .scenario > .content > .graph {
 	width: 70%;
-	border: 1px #EC368D solid;
+	border: 1px var(--color-secondary) solid;
 	border-radius: 1em;
 }
 
@@ -133,12 +139,11 @@ div.content {
 
 .scenario > .content > .data > .title{	
 	font-size: 1.25em;
-	/*color: #EC368D;*/
 	margin: 1% auto 1% auto;
 }
 
 .scenario > .content > .data > .data-sep {	
-	border: 2px #EC368D;
+	border: 2px var(--color-secondary);
     border-style: dashed none none none; 
     margin: 1em 12.5% 1em 12.5%;
 }
@@ -149,15 +154,15 @@ table.datatable {
 }
 
 .datatable .bottomborder{
-	border-bottom: 1px solid #47DDFF;
+	border-bottom: 1px solid var(--color-main);
 }
 
 .datatable .rightborder{
-	border-right: 1px solid #47DDFF;
+	border-right: 1px solid var(--color-main);
 }
 
 .datatable .row1 {
-	color: #47DDFF;
+	color: var(--color-main);
 }
 
 .datatable .row1 td{
@@ -165,7 +170,7 @@ table.datatable {
 }
 
 .datatable .category {
-	color: #47DDFF;	
+	color: var(--color-main);	
 }
 
 .datatable .value {
@@ -181,7 +186,7 @@ div.no-scenarios{
 /* scenario separator styling */
 
 hr.scenario-sep{
-	border: 2px dashed #47DDFF;
+	border: 2px dashed var(--color-main);
     border-style: dashed none none none; 
     margin: 1em 12.5% 1em 12.5%;
 }

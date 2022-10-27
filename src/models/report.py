@@ -19,8 +19,15 @@ CHAR_TRIANGLE = '\u2BC8'
 
 REPORT_RESOURCES_FOLDERNAME = 'report_resources'
 REPORT_FILENAME = 'KSV_report.html'
+CSS_FILENAME = 'style.css'
 
-# todo add use config
+CSS_REPLACER_MARK = '$REPLACEME$'
+CSS_REPLACER_COLOR_BG = 'COLOR-BG'
+CSS_REPLACER_COLOR_TEXT = 'COLOR-TEXT'
+CSS_REPLACER_COLOR_TITLES = 'COLOR-TITLES'
+CSS_REPLACER_COLOR_MAIN = 'COLOR-MAIN'
+CSS_REPLACER_COLOR_SECONDARY = 'COLOR-SECONDARY'
+
 class Report:
 	def __init__(self, playlist, cfg: Config):
 		self.playlist = playlist
@@ -125,7 +132,6 @@ class Report:
 			ax.axvline(x=x, linestyle=(0, (5, 5)), color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_WEEKLINE), alpha=0.3, linewidth=0.75)
 			x = x - timedelta(days=7)
 
-
 		# plot max and min
 		min_y = data_y_values['min']
 		max_y = data_y_values['max']
@@ -207,7 +213,8 @@ class Report:
 				with tag('title'):
 					text('KovaaK\'s Stat Report')
 
-				doc.stag('link', rel='stylesheet', href=self.cfg.get_path(ckeys.PATHKEY_CSS))
+				css_path = os.path.join(self.resources_folder_path, CSS_FILENAME)
+				doc.stag('link', rel='stylesheet', href=css_path)
 
 			with tag('body'):
 				with tag('div', klass='header'):
@@ -334,4 +341,33 @@ class Report:
 			fp.write(report_content)
 
 		return fpath
- 
+
+	def generate_css(self):
+		template_css_path = self.cfg.get_path(ckeys.PATHKEY_CSS)
+		with io.open(template_css_path, 'r') as fp:
+			css_content = fp.read()
+
+		replacer_color_bg = CSS_REPLACER_MARK + CSS_REPLACER_COLOR_BG + CSS_REPLACER_MARK
+		replacer_color_text = CSS_REPLACER_MARK + CSS_REPLACER_COLOR_TEXT + CSS_REPLACER_MARK
+		replacer_color_titles = CSS_REPLACER_MARK + CSS_REPLACER_COLOR_TITLES + CSS_REPLACER_MARK
+		replacer_color_main = CSS_REPLACER_MARK + CSS_REPLACER_COLOR_MAIN + CSS_REPLACER_MARK
+		replacer_color_secondary = CSS_REPLACER_MARK + CSS_REPLACER_COLOR_SECONDARY + CSS_REPLACER_MARK
+
+		print(replacer_color_bg)
+		print(replacer_color_text)
+		print(replacer_color_titles)
+		print(replacer_color_main)
+		print(replacer_color_secondary)
+		
+		css_content = css_content.replace(replacer_color_bg, self.cfg.get_css(ckeys.CSSKEY_COLOR_BACKGROUND))
+		css_content = css_content.replace(replacer_color_text, self.cfg.get_css(ckeys.CSSKEY_COLOR_TEXT))
+		css_content = css_content.replace(replacer_color_titles, self.cfg.get_css(ckeys.CSSKEY_COLOR_TITLES))
+		css_content = css_content.replace(replacer_color_main, self.cfg.get_css(ckeys.CSSKEY_COLOR_MAIN))
+		css_content = css_content.replace(replacer_color_secondary, self.cfg.get_css(ckeys.CSSKEY_COLOR_SECONDARY))
+
+		return css_content
+
+	def write_css(self, css_content):
+		fpath = os.path.join(self.resources_folder_path, CSS_FILENAME)
+		with io.open(fpath, 'w', encoding='utf-8') as fp:
+			fp.write(css_content)
