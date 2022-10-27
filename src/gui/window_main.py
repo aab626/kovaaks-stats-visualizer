@@ -1,4 +1,6 @@
 import os
+from random import uniform
+from sys import maxsize
 import webbrowser
 
 import tkinter as tk
@@ -8,8 +10,8 @@ from PIL import ImageTk
 
 from models.playlist import Playlist
 from models.playlist import PLAYLIST_SOURCE_LOCAL, PLAYLIST_SOURCE_KOVAAKS
+import models.config as ckeys
 from models.config import Config
-from models.config import PATHKEY_CSS, PATHKEY_KOVAAKS_PLAYLISTS, PATHKEY_LOCAL_PLAYLISTS, PATHKEY_LOCAL_REPORTS, PATHKEY_LOCAL_RESOURCES
 
 from gui.confirmbox import KSVConfirmBox
 from gui.window_createplaylist import CreatePlaylistWindow
@@ -36,6 +38,12 @@ class MainWindow(tk.Tk):
         self.playlists = []
         self.var_playlists = tk.StringVar(value=[])
         self.selected_playlist = None
+
+        self.var_option_auto_open_check = tk.BooleanVar(value=self.cfg.get_option(ckeys.OPTIONKEY_AUTO_OPEN_CHECK))
+        self.var_option_group_sessions_check = tk.BooleanVar(value=self.cfg.get_option(ckeys.OPTIONKEY_GROUP_SESSIONS_CHECK))
+        self.var_option_group_sessions_number = tk.IntVar(value=self.cfg.get_option(ckeys.OPTIONKEY_GROUP_SESSIONS_NUMBER))
+        self.var_option_days_check = tk.BooleanVar(value=self.cfg.get_option(ckeys.OPTIONKEY_DAYS_CHECK))
+        self.var_option_days_number = tk.IntVar(value=self.cfg.get_option(ckeys.OPTIONKEY_DAYS_NUMBER))
 
         self.playlist_listbox = None
         self.banner_regular = None
@@ -105,18 +113,43 @@ class MainWindow(tk.Tk):
         # self.update_scenarios()
 
         # right frame: options
-        # todo implement options
+        # todo implement options functionality
         frame_options = ttk.LabelFrame(frame_right, text='Options')
         frame_options.grid(row=1, column=0, sticky='news', pady=(0, 10))
         frame_options.columnconfigure(0, weight=1)
 
-        option1_checkbox = ttk.Checkbutton(frame_options, text='Open report after generating')
-        option2_checkbox = ttk.Checkbutton(frame_options, text='Group sessions')
-        option3_checkbox = ttk.Checkbutton(frame_options, text='Include only last X days')
+        # option 1: auto open
+        frame_option_auto_open = ttk.Frame(frame_options)
+        checkbox_option_auto_open = ttk.Checkbutton(frame_option_auto_open, text='Open report after generation', variable=self.var_option_auto_open_check)
+        
+        frame_option_auto_open.grid(row=0, column=0, sticky='news')
+        checkbox_option_auto_open.grid(row=0, column=0, sticky='nsw')
 
-        option1_checkbox.grid(row=0, column=0, sticky='w')
-        option2_checkbox.grid(row=1, column=0, sticky='w')
-        option3_checkbox.grid(row=2, column=0, sticky='w')
+        # option 2: session grouping
+        frame_option_group_sessions = ttk.Frame(frame_options)
+        checkbox_option_group_sessions = ttk.Checkbutton(frame_option_group_sessions, text='Group Sessions by', variable=self.var_option_group_sessions_check)
+        entry_option_group_sessions = ttk.Entry(frame_option_group_sessions, width=5, textvariable=self.var_option_group_sessions_number)
+        label_option_group_sessions = ttk.Label(frame_option_group_sessions, text='hours')
+
+        frame_option_group_sessions.grid(row=1, column=0, sticky='news')
+        checkbox_option_group_sessions.grid(row=0, column=0, sticky='nsw')
+        entry_option_group_sessions.grid(row=0, column=1, sticky='nsw')
+        label_option_group_sessions.grid(row=0, column=2, sticky='nsw')
+
+        # option 3: days selection
+        frame_option_days = ttk.Frame(frame_options)
+        checkbox_option_days = ttk.Checkbutton(frame_option_days, text='Analyze last', variable=self.var_option_days_check)
+        entry_option_days = ttk.Entry(frame_option_days, width=5, textvariable=self.var_option_days_number)
+        label_option_days = ttk.Label(frame_option_days, text='days')
+
+        frame_option_days.grid(row=2, column=0, sticky='news')
+        checkbox_option_days.grid(row=0, column=0, sticky='nsw')
+        entry_option_days.grid(row=0, column=1, sticky='nsw')
+        label_option_days.grid(row=0, column=2, sticky='nsw')
+
+        for frame_child in frame_options.winfo_children():
+            frame_child.grid_configure(padx=(5, 5), pady=(2, 0))
+
 
         button_browse_folder = ttk.Button(frame_options, text='Change KovaaK\'s folder', command=self.command_browse_kovaaks_folder)
         button_browse_folder.grid(row=3, column=0, sticky='ns', pady=(5, 5))
@@ -127,8 +160,8 @@ class MainWindow(tk.Tk):
 
         # right frame: banner
         self.banner_label = ttk.Label(frame_right, cursor='hand2')
-        self.banner_regular = ImageTk.PhotoImage(master=self.banner_label, file=os.path.join(self.cfg.get_path(PATHKEY_LOCAL_RESOURCES), BANNER_REGULAR_FILENAME))
-        self.banner_hover = ImageTk.PhotoImage(master=self.banner_label, file=os.path.join(self.cfg.get_path(PATHKEY_LOCAL_RESOURCES), BANNER_HOVER_FILENAME))
+        self.banner_regular = ImageTk.PhotoImage(master=self.banner_label, file=os.path.join(self.cfg.get_path(ckeys.PATHKEY_LOCAL_RESOURCES), BANNER_REGULAR_FILENAME))
+        self.banner_hover = ImageTk.PhotoImage(master=self.banner_label, file=os.path.join(self.cfg.get_path(ckeys.PATHKEY_LOCAL_RESOURCES), BANNER_HOVER_FILENAME))
         self.banner_label.configure(image=self.banner_regular)
         self.banner_label.grid(row=3, column=0, sticky='s', pady=(0, 5))
 
@@ -155,8 +188,8 @@ class MainWindow(tk.Tk):
         window.mainloop()
 
     def command_reload_playlists(self, *args):
-        kovaaks_playlists = Playlist.get_kovaaks_playlists(self.cfg.get_path(PATHKEY_KOVAAKS_PLAYLISTS))
-        local_playlists = Playlist.get_local_playlists(self.cfg.get_path(PATHKEY_LOCAL_PLAYLISTS))
+        kovaaks_playlists = Playlist.get_kovaaks_playlists(self.cfg.get_path(ckeys.PATHKEY_KOVAAKS_PLAYLISTS))
+        local_playlists = Playlist.get_local_playlists(self.cfg.get_path(ckeys.PATHKEY_LOCAL_PLAYLISTS))
         self.playlists = kovaaks_playlists + local_playlists
         self.playlists.sort(key=lambda p: p.name)
 
@@ -171,7 +204,7 @@ class MainWindow(tk.Tk):
                 parent      =   self,
                 title       =   'Confirm playlist deletion',
                 message     =   f'About to delete: {self.selected_playlist.name}\nThis operation cannot be undone.',
-                icon_path   =   os.path.join(self.cfg.get_path(PATHKEY_LOCAL_RESOURCES), ICON_QUESTION_FILENAME),
+                icon_path=os.path.join(self.cfg.get_path(ckeys.PATHKEY_LOCAL_RESOURCES), ICON_QUESTION_FILENAME),
                 text_option1=   'Delete',
                 f_option1   =   self.command_delete_playlist,
                 text_option2=   'Cancel',
@@ -190,7 +223,7 @@ class MainWindow(tk.Tk):
             self.bell()
 
     def command_browse_kovaaks_folder(self, *args):
-        icon_error_path = os.path.join(self.cfg.get_path(PATHKEY_LOCAL_RESOURCES), ICON_ERROR_FILENAME)
+        icon_error_path = os.path.join(self.cfg.get_path(ckeys.PATHKEY_LOCAL_RESOURCES), ICON_ERROR_FILENAME)
         window = BrowseKovaaksFolder(self.cfg, icon_error_path)
         window.mainloop()
 

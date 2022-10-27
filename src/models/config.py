@@ -38,6 +38,12 @@ CSSKEY_COLOR_TITLES = 'color:titles'
 CSSKEY_COLOR_MAIN = 'color:main'
 CSSKEY_COLOR_SECONDARY = 'color:secondary'
 
+OPTIONKEY_AUTO_OPEN_CHECK = 'option:auto_open_check'
+OPTIONKEY_GROUP_SESSIONS_CHECK = 'option:group_sessions_check'
+OPTIONKEY_GROUP_SESSIONS_NUMBER = 'option:group_sessions_number'
+OPTIONKEY_DAYS_CHECK = 'option:days_check'
+OPTIONKEY_DAYS_NUMBER = 'option:days_number'
+
 KOVAAKS_STATS_SUBPATH = os.path.join('FPSAimTrainer', 'stats')
 KOVAAKS_PLAYLISTS_SUBPATH = os.path.join('FPSAimTrainer', 'Saved', 'SaveGames', 'Playlists')
 LOCAL_STYLE_SUBPATH = os.path.join('style_template.css')
@@ -87,6 +93,12 @@ class Config:
         self.get_data()[SECTION_OPTIONS] = dict()
         options = self.get_data()[SECTION_OPTIONS]
 
+        options[OPTIONKEY_AUTO_OPEN_CHECK] = True
+        options[OPTIONKEY_GROUP_SESSIONS_CHECK] = True
+        options[OPTIONKEY_GROUP_SESSIONS_NUMBER] = 6
+        options[OPTIONKEY_DAYS_CHECK] = True
+        options[OPTIONKEY_DAYS_NUMBER] = 30
+
         # css
         self.get_data()[SECTION_CSS] = dict()
         css = self.get_data()[SECTION_CSS]
@@ -101,19 +113,19 @@ class Config:
         self.get_data()[SECTION_GRAPHS] = dict()
         graphs = self.get_data()[SECTION_GRAPHS]
 
-        graphs['color:weekline'] = '#7f7f7f'
-        graphs['color:min'] = '#47DDFF'
-        graphs['color:max'] = '#47DDFF'
-        graphs['color:score_curve'] = '#47DDFF'
-        graphs['color:score_data'] = '#4781ff'
-        graphs['color:average_curve'] = '#EC368D'
-        graphs['color:average_data'] = '#F2FF49'
-        graphs['color:xticks'] = '#47DDFF'
-        graphs['color:xtickslabels'] = '#F1F1F9'
-        graphs['color:yticks'] = '#47DDFF'
-        graphs['color:ytickslabels'] = '#F1F1F9'
-        graphs['color:border_left'] = '#47DDFF'
-        graphs['color:border_bottom'] = '#47DDFF'
+        graphs[GRAPHKEY_COLOR_WEEKLINE] = '#7f7f7f'
+        graphs[GRAPHKEY_COLOR_MIN] = '#47DDFF'
+        graphs[GRAPHKEY_COLOR_MAX] = '#47DDFF'
+        graphs[GRAPHKEY_COLOR_SCORECURVE] = '#47DDFF'
+        graphs[GRAPHKEY_COLOR_SCOREDATA] = '#4781ff'
+        graphs[GRAPHKEY_COLOR_AVERAGECURVE] = '#EC368D'
+        graphs[GRAPHKEY_COLOR_AVERAGEDATA] = '#F2FF49'
+        graphs[GRAPHKEY_COLOR_XTICKS] = '#47DDFF'
+        graphs[GRAPHKEY_COLOR_XTICKSLABELS] = '#F1F1F9'
+        graphs[GRAPHKEY_COLOR_YTICKS] = '#47DDFF'
+        graphs[GRAPHKEY_COLOR_YTICKSLABELS] = '#F1F1F9'
+        graphs[GRAPHKEY_COLOR_BORDERLEFT] = '#47DDFF'
+        graphs[GRAPHKEY_COLOR_BORDERBOTTOM] = '#47DDFF'
 
     def get_path(self, path_key):
         paths = self.get_data()[SECTION_PATH]
@@ -161,10 +173,21 @@ class Config:
     def get_css(self, css_key):
         css = self.get_data()[SECTION_CSS]
         if css_key not in css:
-            raise KeyError(f'Invalid config graph key: {css_key}')
+            raise KeyError(f'Invalid config css key: {css_key}')
 
         return css[css_key]
 
-    # todo add logic for option saving, use key format type:varname for type casting
+    def get_option(self, option_key):
+        options = self.get_data()[SECTION_OPTIONS]
+        if option_key not in options:
+            raise KeyError(f'Invalid config option key: {option_key}')
+
+        return options[option_key]
+
     def set_option(self, option_key, value):
-        pass
+        options = self.get_data()[SECTION_OPTIONS]
+        if option_key not in options:
+            raise KeyError(f'Invalid config option key: {option_key}')
+        
+        value_casted = type(options[option_key])(value)
+        options[option_key] = value_casted
