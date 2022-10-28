@@ -51,4 +51,5 @@ class Main():
         
 
 if __name__ == '__main__':
+    # todo update notification
     Main()

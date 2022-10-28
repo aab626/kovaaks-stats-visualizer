@@ -1,6 +1,8 @@
 import os
 from random import uniform
+from re import T
 from sys import maxsize
+from turtle import back
 import webbrowser
 
 import tkinter as tk
@@ -41,9 +43,12 @@ class MainWindow(tk.Tk):
 
         self.var_option_auto_open_check = tk.BooleanVar(value=self.cfg.get_option(ckeys.OPTIONKEY_AUTO_OPEN_CHECK))
         self.var_option_group_sessions_check = tk.BooleanVar(value=self.cfg.get_option(ckeys.OPTIONKEY_GROUP_SESSIONS_CHECK))
-        self.var_option_group_sessions_number = tk.IntVar(value=self.cfg.get_option(ckeys.OPTIONKEY_GROUP_SESSIONS_NUMBER))
+        self.var_option_group_sessions_number = tk.StringVar(value=self.cfg.get_option(ckeys.OPTIONKEY_GROUP_SESSIONS_NUMBER))
         self.var_option_days_check = tk.BooleanVar(value=self.cfg.get_option(ckeys.OPTIONKEY_DAYS_CHECK))
-        self.var_option_days_number = tk.IntVar(value=self.cfg.get_option(ckeys.OPTIONKEY_DAYS_NUMBER))
+        self.var_option_days_number = tk.StringVar(value=self.cfg.get_option(ckeys.OPTIONKEY_DAYS_NUMBER))
+        
+        self.var_option_group_sessions_number.trace_add('write', self.f_command_option_group_sessions_number)
+        self.var_option_days_number.trace_add('write', self.f_command_option_days_number)
 
         self.playlist_listbox = None
         self.banner_regular = None
@@ -113,38 +118,40 @@ class MainWindow(tk.Tk):
         # self.update_scenarios()
 
         # right frame: options
-        # todo implement options functionality
         frame_options = ttk.LabelFrame(frame_right, text='Options')
         frame_options.grid(row=1, column=0, sticky='news', pady=(0, 10))
         frame_options.columnconfigure(0, weight=1)
 
         # option 1: auto open
         frame_option_auto_open = ttk.Frame(frame_options)
-        checkbox_option_auto_open = ttk.Checkbutton(frame_option_auto_open, text='Open report after generation', variable=self.var_option_auto_open_check)
+        checkbox_option_auto_open = ttk.Checkbutton(frame_option_auto_open, text='Open report after generation', variable=self.var_option_auto_open_check, command=self.f_command_option_auto_open)
         
         frame_option_auto_open.grid(row=0, column=0, sticky='news')
         checkbox_option_auto_open.grid(row=0, column=0, sticky='nsw')
 
         # option 2: session grouping
         frame_option_group_sessions = ttk.Frame(frame_options)
-        checkbox_option_group_sessions = ttk.Checkbutton(frame_option_group_sessions, text='Group Sessions by', variable=self.var_option_group_sessions_check)
-        entry_option_group_sessions = ttk.Entry(frame_option_group_sessions, width=5, textvariable=self.var_option_group_sessions_number)
+        checkbox_option_group_sessions = ttk.Checkbutton(frame_option_group_sessions, text='Group Sessions by', variable=self.var_option_group_sessions_check, command=self.f_command_option_group_sessions_check)
+
+        state = 'enabled' if self.var_option_group_sessions_check.get() else 'disabled'
+        self.entry_option_group_sessions = ttk.Entry(frame_option_group_sessions, width=5, textvariable=self.var_option_group_sessions_number, state=state)
         label_option_group_sessions = ttk.Label(frame_option_group_sessions, text='hours')
 
         frame_option_group_sessions.grid(row=1, column=0, sticky='news')
         checkbox_option_group_sessions.grid(row=0, column=0, sticky='nsw')
-        entry_option_group_sessions.grid(row=0, column=1, sticky='nsw')
+        self.entry_option_group_sessions.grid(row=0, column=1, sticky='nsw')
         label_option_group_sessions.grid(row=0, column=2, sticky='nsw')
 
         # option 3: days selection
         frame_option_days = ttk.Frame(frame_options)
-        checkbox_option_days = ttk.Checkbutton(frame_option_days, text='Analyze last', variable=self.var_option_days_check)
-        entry_option_days = ttk.Entry(frame_option_days, width=5, textvariable=self.var_option_days_number)
+        checkbox_option_days = ttk.Checkbutton(frame_option_days, text='Analyze last', variable=self.var_option_days_check, command=self.f_command_option_days_check)
+        state = 'enabled' if self.var_option_days_check.get() else 'disabled'
+        self.entry_option_days = ttk.Entry(frame_option_days, width=5, textvariable=self.var_option_days_number, state=state)
         label_option_days = ttk.Label(frame_option_days, text='days')
 
         frame_option_days.grid(row=2, column=0, sticky='news')
         checkbox_option_days.grid(row=0, column=0, sticky='nsw')
-        entry_option_days.grid(row=0, column=1, sticky='nsw')
+        self.entry_option_days.grid(row=0, column=1, sticky='nsw')
         label_option_days.grid(row=0, column=2, sticky='nsw')
 
         for frame_child in frame_options.winfo_children():
@@ -183,6 +190,8 @@ class MainWindow(tk.Tk):
             i += 1
 
     # commands
+
+    # playlist commands
     def command_create_playlist(self, *args):
         window = CreatePlaylistWindow(self, self.playlists, self.cfg)
         window.mainloop()
@@ -221,14 +230,68 @@ class MainWindow(tk.Tk):
             self.update_scenarios()
         else:
             self.bell()
-
+    
+    # option commands: browse kovaaks folder
     def command_browse_kovaaks_folder(self, *args):
         icon_error_path = os.path.join(self.cfg.get_path(ckeys.PATHKEY_LOCAL_RESOURCES), ICON_ERROR_FILENAME)
         window = BrowseKovaaksFolder(self.cfg, icon_error_path)
         window.mainloop()
 
+    # option commands
+    # option: auto open
+    def f_command_option_auto_open(self, *args):
+        self.cfg.set_option(ckeys.OPTIONKEY_AUTO_OPEN_CHECK, self.var_option_auto_open_check.get())
+
+    # option: group sessions
+    def f_command_option_group_sessions_check(self, *args):
+        self.cfg.set_option(ckeys.OPTIONKEY_GROUP_SESSIONS_CHECK, self.var_option_group_sessions_check.get())
+
+        state = 'enabled' if self.var_option_group_sessions_check.get() else 'disabled'
+        self.entry_option_group_sessions.config(state=state)
+
+    def f_command_option_group_sessions_number(self, *args):
+        if self.var_option_group_sessions_number.get().isdigit():
+            self.entry_option_group_sessions.configure(foreground='black')
+            self.cfg.set_option(ckeys.OPTIONKEY_GROUP_SESSIONS_NUMBER, int(self.var_option_group_sessions_number.get()))
+        else:
+            self.entry_option_group_sessions.configure(foreground='red')
+
+    # option: days
+    def f_command_option_days_check(self, *args):
+        self.cfg.set_option(ckeys.OPTIONKEY_DAYS_CHECK, self.var_option_days_check.get())
+        
+        state = 'enabled' if self.var_option_days_check.get() else 'disabled'
+        self.entry_option_days.config(state=state)
+
+    def f_command_option_days_number(self, *args):
+        if self.var_option_days_number.get().isdigit():
+            self.entry_option_days.configure(foreground='black')
+            self.cfg.set_option(ckeys.OPTIONKEY_DAYS_NUMBER, int(self.var_option_days_number.get()))
+        else:
+            self.entry_option_days.configure(foreground='red')
+
+    # generate commands
     def command_generate_report(self, *args):
-        if self.selected_playlist is not None:
+        c1 = self.selected_playlist is not None
+        
+        if self.cfg.get_option(ckeys.OPTIONKEY_GROUP_SESSIONS_CHECK):
+            if self.var_option_group_sessions_number.get().isdigit():
+                c2 = True
+            else:
+                c2 = False
+        else:
+            c2 = True
+        
+        if self.cfg.get_option(ckeys.OPTIONKEY_DAYS_CHECK):
+            if self.var_option_days_number.get().isdigit():
+                c3 = True
+            else:
+                c3 = False
+        else:
+            c3 = True
+
+        conditions = c1 and c2 and c3
+        if conditions:
             report = Report(self.selected_playlist, self.cfg)
             report_content = report.generate_report()
             report_path = report.write_report(report_content)
@@ -236,7 +299,8 @@ class MainWindow(tk.Tk):
             css_content = report.generate_css()
             report.write_css(css_content)
 
-            webbrowser.open(report_path, new=2)
+            if self.cfg.get_option(ckeys.OPTIONKEY_AUTO_OPEN_CHECK):
+                webbrowser.open(report_path, new=2)
         else:
             self.bell()
 

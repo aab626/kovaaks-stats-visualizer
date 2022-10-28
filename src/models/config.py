@@ -191,3 +191,8 @@ class Config:
         
         value_casted = type(options[option_key])(value)
         options[option_key] = value_casted
+
+        self.save_config()
+
+
+# todo keep track of version in order to upgrade config file

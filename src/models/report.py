@@ -246,22 +246,29 @@ class Report:
 									text(CHAR_TRIANGLE)
 								with tag('h3', klass='name'):
 									text(scenario_name)
-
-							scenarios = self.load_scenario_stats(scenario_name, days_n=30)
+							
+							days = self.cfg.get_option(ckeys.OPTIONKEY_DAYS_NUMBER) if self.cfg.get_option(ckeys.OPTIONKEY_DAYS_CHECK) else None
+							scenarios = self.load_scenario_stats(scenario_name, days_n=days)
 
 							# if there are played scenarios, plot graph
 							if len(scenarios) > 0:
-								scenarios_grouped = self.group_sessions(scenarios, hours_n=8)
-								x, data_y_ungrouped = self.make_plottable_data(scenarios, target=TARGET_SCORE)
-								data_y_values = self.get_data_values(data_y_ungrouped)
+								if self.cfg.get_option(ckeys.OPTIONKEY_GROUP_SESSIONS_CHECK):
+									hours_threshold = self.cfg.get_option(ckeys.OPTIONKEY_GROUP_SESSIONS_NUMBER)
+									scenarios_grouped = self.group_sessions(scenarios, hours_n=hours_threshold)
+									data = self.make_plottable_data(scenarios_grouped, target=TARGET_SCORE)
+								else:
+									data = self.make_plottable_data(scenarios, target=TARGET_SCORE)
 
-								data = self.make_plottable_data(scenarios_grouped, target=TARGET_SCORE)
-								data_y_avg = self.make_averaged_data(data[1], average_sessions=5)
-								data_y_avg_ungrouped = self.make_averaged_data(data_y_ungrouped, average_sessions=5)
-								data_y_avg_values = self.get_data_values(data_y_avg_ungrouped)
+								x_ungrouped, y_ungrouped = self.make_plottable_data(scenarios, target=TARGET_SCORE)
+								y_values = self.get_data_values(y_ungrouped)
+
+								# todo if plot average curve
+								y_avg = self.make_averaged_data(data[1], average_sessions=5)
+								y_avg_ungrouped = self.make_averaged_data(y_avg, average_sessions=5)
+								y_avg_values = self.get_data_values(y_avg_ungrouped)
 
 								with tag('div', klass='content'):
-									img_path = self.plot(data[0], data[1], data_y_avg, data_y_values, scenario_name, self.resources_folder_path)
+									img_path = self.plot(data[0], data[1], y_avg, y_avg_values, scenario_name, self.resources_folder_path)
 									doc.stag('img', src=img_path, klass='graph')
 
 									with tag('div', klass='data'):
@@ -284,33 +291,33 @@ class Report:
 													with tag('td', klass='category rightborder'):
 														text('Max')
 													with tag('td', klass='value'):
-														text(data_y_values['max'])
+														text(y_values['max'])
 													with tag('td', klass='value'):
-														text(data_y_avg_values['max'])
+														text(y_avg_values['max'])
 
 												with tag('tr', klass='row3'):
 													with tag('td', klass='category rightborder'):
 														text('Min')
 													with tag('td', klass='value'):
-														text(data_y_values['min'])
+														text(y_values['min'])
 													with tag('td', klass='value'):
-														text(data_y_avg_values['min'])
+														text(y_avg_values['min'])
 
 												with tag('tr', klass='row4'):
 													with tag('td', klass='category rightborder'):
 														text('Avg')
 													with tag('td', klass='value'):
-														text(data_y_values['avg'])
+														text(y_values['avg'])
 													with tag('td', klass='value'):
-														text(data_y_avg_values['avg'])
+														text(y_avg_values['avg'])
 
 												with tag('tr', klass='row5'):
 													with tag('td', klass='category rightborder'):
 														text('StDev')
 													with tag('td', klass='value'):
-														text(data_y_values['std'])
+														text(y_values['std'])
 													with tag('td', klass='value'):
-														text(data_y_avg_values['std'])
+														text(y_avg_values['std'])
 
 							# otherwise, display an alert in the report
 							else:
@@ -352,12 +359,6 @@ class Report:
 		replacer_color_titles = CSS_REPLACER_MARK + CSS_REPLACER_COLOR_TITLES + CSS_REPLACER_MARK
 		replacer_color_main = CSS_REPLACER_MARK + CSS_REPLACER_COLOR_MAIN + CSS_REPLACER_MARK
 		replacer_color_secondary = CSS_REPLACER_MARK + CSS_REPLACER_COLOR_SECONDARY + CSS_REPLACER_MARK
-
-		print(replacer_color_bg)
-		print(replacer_color_text)
-		print(replacer_color_titles)
-		print(replacer_color_main)
-		print(replacer_color_secondary)
 		
 		css_content = css_content.replace(replacer_color_bg, self.cfg.get_css(ckeys.CSSKEY_COLOR_BACKGROUND))
 		css_content = css_content.replace(replacer_color_text, self.cfg.get_css(ckeys.CSSKEY_COLOR_TEXT))
