@@ -45,9 +45,9 @@ OPTIONKEY_GROUP_SESSIONS_NUMBER = 'option:group_sessions_number'
 OPTIONKEY_DAYS_CHECK = 'option:days_check'
 OPTIONKEY_DAYS_NUMBER = 'option:days_number'
 
-APPKEY_VERSION = 'appkey:version'
-APPKEY_VERSION_OUTDATED = 'appkey:version_outdated'
-APPKEY_VERSION_MISSCHECK = 'appkey:version_misscheck'
+APPKEY_VERSION = 'version:version_number'
+APPKEY_VERSION_OUTDATED = 'version:version_outdated'
+APPKEY_VERSION_MISSCHECK = 'version:version_misscheck'
 
 KOVAAKS_STATS_SUBPATH = os.path.join('FPSAimTrainer', 'stats')
 KOVAAKS_PLAYLISTS_SUBPATH = os.path.join('FPSAimTrainer', 'Saved', 'SaveGames', 'Playlists')
