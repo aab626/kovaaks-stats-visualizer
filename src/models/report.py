@@ -4,11 +4,10 @@ from datetime import datetime, date, timedelta
 
 import numpy as np
 from matplotlib import pyplot as plt
-from scipy.interpolate import Akima1DInterpolator, PchipInterpolator
+from scipy.interpolate import PchipInterpolator
 
 import yattag
 
-from models.playlist import Playlist
 from models.scenario import Scenario
 from models.scenario import TARGET_SCORE
 import models.config as ckeys
@@ -108,7 +107,6 @@ class Report:
 		return scenarios_merged
 
 	# todo add percentage diff values over score/avg curves
-	# todo change interpolator to pchip
 	def plot(self, data_x, data_y, data_y_avg, data_y_values, scenario_name, folder_path):
 		if len(data_x) >= 2:
 			# smooth x data
