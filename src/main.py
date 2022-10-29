@@ -1,9 +1,10 @@
 import os
 
 from models.config import Config
+import models.config as ckeys
 from models.config import CONFIG_FILENAME
-from models.config import PATHKEY_KOVAAKS_FOLDER, PATHKEY_LOCAL_RESOURCES, PATHKEY_LOCAL_PLAYLISTS, PATHKEY_LOCAL_REPORTS
 from gui.window_main import MainWindow
+from gui.messagebox import KSVMessageBox
 from gui.window_promptkovaaksfolder import BrowseKovaaksFolder
 from util.version import VersionChecker
 
@@ -20,17 +21,29 @@ class Main():
         cfg_exists_at_run = os.path.exists(cfg_path)
         self.cfg = Config(cfg_path)
 
-        # todo remember to alter version after changes
-        version_checker = VersionChecker()
+        version_local = VersionChecker()
+        version_local.load_local_version()
+        self.cfg.set_app(ckeys.APPKEY_VERSION, str(version_local))
+        self.cfg.set_app(ckeys.APPKEY_VERSION_OUTDATED, False)
+        self.cfg.set_app(ckeys.APPKEY_VERSION_MISSCHECK, False)
+
+        try:
+            version_remote = VersionChecker()
+            version_remote.load_remote_version()
+
+            if version_local.compare_versions(version_remote) < 0:
+                self.cfg.set_app(ckeys.APPKEY_VERSION_OUTDATED, True)
+        except Exception as e:
+            self.cfg.set_app(ckeys.APPKEY_VERSION_MISSCHECK, True)
 
         # check folders, then run koovaks folder prompt if no config was found earlier
         folders = self.create_folders()
-        if not cfg_exists_at_run or self.cfg.get_path(PATHKEY_KOVAAKS_FOLDER) is None:
-            self.cfg.set_path(PATHKEY_LOCAL_RESOURCES, os.path.join(os.getcwd(), LOCAL_RESOURCES_FOLDERNAME))
-            self.cfg.set_path(PATHKEY_LOCAL_PLAYLISTS, folders[PATHKEY_LOCAL_PLAYLISTS])
-            self.cfg.set_path(PATHKEY_LOCAL_REPORTS, folders[PATHKEY_LOCAL_REPORTS])
+        if not cfg_exists_at_run or self.cfg.get_path(ckeys.PATHKEY_KOVAAKS_FOLDER) is None:
+            self.cfg.set_path(ckeys.PATHKEY_LOCAL_RESOURCES, os.path.join(os.getcwd(), LOCAL_RESOURCES_FOLDERNAME))
+            self.cfg.set_path(ckeys.PATHKEY_LOCAL_PLAYLISTS, folders[ckeys.PATHKEY_LOCAL_PLAYLISTS])
+            self.cfg.set_path(ckeys.PATHKEY_LOCAL_REPORTS, folders[ckeys.PATHKEY_LOCAL_REPORTS])
             
-            icon_error_path = os.path.join(self.cfg.get_path(PATHKEY_LOCAL_RESOURCES), ICON_ERROR_FILENAME)
+            icon_error_path = os.path.join(self.cfg.get_path(ckeys.PATHKEY_LOCAL_RESOURCES), ICON_ERROR_FILENAME)
             window = BrowseKovaaksFolder(self.cfg, icon_error_path)
             window.mainloop()
 
@@ -47,13 +60,8 @@ class Main():
         if not os.path.isdir(local_reports_path):
             os.mkdir(local_reports_path)
 
-        return {PATHKEY_LOCAL_PLAYLISTS: local_playlists_path, PATHKEY_LOCAL_REPORTS: local_reports_path}
-
+        return {ckeys.PATHKEY_LOCAL_PLAYLISTS: local_playlists_path, ckeys.PATHKEY_LOCAL_REPORTS: local_reports_path}
         
-
-
-        
-
+# execution
 if __name__ == '__main__':
-    # todo update notification
     Main()

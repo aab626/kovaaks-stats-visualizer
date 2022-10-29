@@ -16,6 +16,7 @@ import models.config as ckeys
 from models.config import Config
 
 from gui.confirmbox import KSVConfirmBox
+from gui.messagebox import KSVMessageBox
 from gui.window_createplaylist import CreatePlaylistWindow
 from gui.window_promptkovaaksfolder import BrowseKovaaksFolder
 from models.report import Report
@@ -56,6 +57,7 @@ class MainWindow(tk.Tk):
         
         # widget init
         self.create_widgets()
+        self.alert_version()
 
     # main application window
     def create_widgets(self):
@@ -189,8 +191,25 @@ class MainWindow(tk.Tk):
             ttk.Label(self.frame_playlist_info, text=scenario_name).grid(row=i, column=1, sticky='w')
             i += 1
 
-    # commands
+    def alert_version(self):
+        if self.cfg.get_app(ckeys.APPKEY_VERSION_OUTDATED):
+            KSVMessageBox(
+                parent=self,
+                title='Version outdated',
+                message='This version of KovaaK\'s Stat Visualizer is outdated!\nClick the banner in the main window to download the most recent version.',
+                icon_path=os.path.join(self.cfg.get_path(ckeys.PATHKEY_LOCAL_RESOURCES), ICON_ERROR_FILENAME)
+            )
+        elif self.cfg.get_app(ckeys.APPKEY_VERSION_MISSCHECK):
+            KSVMessageBox(
+                parent=self,
+                title='Version could not be check',
+                message='Could not check the most recent version of KovaaK\'s Stat Visualizer.\nCheck your internet connection.',
+                icon_path=os.path.join(self.cfg.get_path(ckeys.PATHKEY_LOCAL_RESOURCES), ICON_ERROR_FILENAME)
+            )
+        else:
+            pass
 
+    # commands
     # playlist commands
     def command_create_playlist(self, *args):
         window = CreatePlaylistWindow(self, self.playlists, self.cfg)
@@ -213,7 +232,7 @@ class MainWindow(tk.Tk):
                 parent      =   self,
                 title       =   'Confirm playlist deletion',
                 message     =   f'About to delete: {self.selected_playlist.name}\nThis operation cannot be undone.',
-                icon_path=os.path.join(self.cfg.get_path(ckeys.PATHKEY_LOCAL_RESOURCES), ICON_QUESTION_FILENAME),
+                icon_path   =   os.path.join(self.cfg.get_path(ckeys.PATHKEY_LOCAL_RESOURCES), ICON_QUESTION_FILENAME),
                 text_option1=   'Delete',
                 f_option1   =   self.command_delete_playlist,
                 text_option2=   'Cancel',

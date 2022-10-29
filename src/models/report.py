@@ -4,7 +4,7 @@ from datetime import datetime, date, timedelta
 
 import numpy as np
 from matplotlib import pyplot as plt
-from scipy.interpolate import Akima1DInterpolator
+from scipy.interpolate import Akima1DInterpolator, PchipInterpolator
 
 import yattag
 
@@ -117,11 +117,11 @@ class Report:
 			x_smooth = [datetime.fromtimestamp(t) for t in x_smooth_floats]
 			
 			# score curve
-			interpolated_score = Akima1DInterpolator(x_floats, data_y)
+			interpolated_score = PchipInterpolator(x_floats, data_y)
 			y_smooth = interpolated_score(x_smooth_floats)
 
 			# average curve
-			interpolated_avg = Akima1DInterpolator(x_floats, data_y_avg)
+			interpolated_avg = PchipInterpolator(x_floats, data_y_avg)
 			y_smooth_avg = interpolated_avg(x_smooth_floats)
 
 		fig, ax = plt.subplots(figsize=(10, 5))

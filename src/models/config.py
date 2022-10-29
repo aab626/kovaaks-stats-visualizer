@@ -9,6 +9,7 @@ SECTION_PATH = 'PATHS'
 SECTION_OPTIONS = 'OPTIONS'
 SECTION_CSS = 'CSS'
 SECTION_GRAPHS = 'GRAPHS'
+SECTION_APP = 'APP'
 
 PATHKEY_KOVAAKS_FOLDER = 'kovaaks_folder'
 PATHKEY_KOVAAKS_STATS = 'kovaaks_stats'
@@ -43,6 +44,10 @@ OPTIONKEY_GROUP_SESSIONS_CHECK = 'option:group_sessions_check'
 OPTIONKEY_GROUP_SESSIONS_NUMBER = 'option:group_sessions_number'
 OPTIONKEY_DAYS_CHECK = 'option:days_check'
 OPTIONKEY_DAYS_NUMBER = 'option:days_number'
+
+APPKEY_VERSION = 'appkey:version'
+APPKEY_VERSION_OUTDATED = 'appkey:version_outdated'
+APPKEY_VERSION_MISSCHECK = 'appkey:version_misscheck'
 
 KOVAAKS_STATS_SUBPATH = os.path.join('FPSAimTrainer', 'stats')
 KOVAAKS_PLAYLISTS_SUBPATH = os.path.join('FPSAimTrainer', 'Saved', 'SaveGames', 'Playlists')
@@ -127,6 +132,14 @@ class Config:
         graphs[GRAPHKEY_COLOR_BORDERLEFT] = '#47DDFF'
         graphs[GRAPHKEY_COLOR_BORDERBOTTOM] = '#47DDFF'
 
+        # app
+        self.get_data()[SECTION_APP] = dict()
+        app = self.get_data()[SECTION_APP]
+
+        app[APPKEY_VERSION] = None
+        app[APPKEY_VERSION_OUTDATED] = False
+        app[APPKEY_VERSION_MISSCHECK] = False
+
     def get_path(self, path_key):
         paths = self.get_data()[SECTION_PATH]
         if path_key not in paths:
@@ -194,5 +207,16 @@ class Config:
 
         self.save_config()
 
+    def get_app(self, app_key):
+        app = self.get_data()[SECTION_APP]
+        if app_key not in app:
+            raise KeyError(f'Invalid app option key: {app_key}')
 
-# todo keep track of version in order to upgrade config file
+        return app[app_key]
+
+    def set_app(self, app_key, value):
+        app = self.get_data()[SECTION_APP]
+        if app_key not in app:
+            raise KeyError(f'Invalid app option key: {app_key}')
+
+        app[app_key] = value

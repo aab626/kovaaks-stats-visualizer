@@ -1,14 +1,15 @@
 from __future__ import annotations
 import os
+import requests
 
 from models.config import Config
 
 VERSION_FILENAME = 'VERSION'
+VERSION_REMOTE_URL = 'https://raw.githubusercontent.com/drizak/kovaaks-stats-visualizer/main/src/VERSION'
 
 class VersionChecker:
     def __init__(self):
         self.version = None
-        self.load_local_version()
 
     def get(self):
         return self.version
@@ -19,12 +20,17 @@ class VersionChecker:
     def load_local_version(self):
         version_file_path = os.path.join(os.getcwd(), VERSION_FILENAME)
         with open(version_file_path, 'r') as fp:
-            version = [int(n) for n in fp.read().strip('\n').split('.')]
+            version = self.parse_version_text(fp.read())
             self.set(version)
 
-    # todo after push
-    def load_git_version(self):
-        pass
+    def load_remote_version(self):
+        r = requests.get(url=VERSION_REMOTE_URL, timeout=5)
+        version = self.parse_version_text(r.text)
+        self.set(version)
+
+    def parse_version_text(self, version_text):
+        version = [int(n) for n in version_text.strip('\n').split('.')]
+        return version
 
     # checks whether a version is higher/lower or equal than other
     # returns:  1:  self is higher than the other version
@@ -51,3 +57,6 @@ class VersionChecker:
             i += 1
         
         return 0
+
+    def __str__(self):
+        return '.'.join([str(n) for n in self.version])
