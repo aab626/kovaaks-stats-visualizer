@@ -269,7 +269,7 @@ class Report:
 								y_avg_values = self.get_data_values(y_avg_ungrouped)
 
 								with tag('div', klass='content'):
-									img_path = self.plot(data[0], data[1], y_avg, y_avg_values, scenario_name, self.resources_folder_path)
+									img_path = self.plot(data[0], data[1], y_avg, y_values, scenario_name, self.resources_folder_path)
 									doc.stag('img', src=img_path, klass='graph')
 
 									with tag('div', klass='data'):
