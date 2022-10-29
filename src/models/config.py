@@ -44,6 +44,7 @@ OPTIONKEY_GROUP_SESSIONS_CHECK = 'option:group_sessions_check'
 OPTIONKEY_GROUP_SESSIONS_NUMBER = 'option:group_sessions_number'
 OPTIONKEY_DAYS_CHECK = 'option:days_check'
 OPTIONKEY_DAYS_NUMBER = 'option:days_number'
+OPTIONKEY_AVERAGE_CHECK = 'option:display_average_check'
 
 APPKEY_VERSION = 'version:version_number'
 APPKEY_VERSION_OUTDATED = 'version:version_outdated'
@@ -103,6 +104,7 @@ class Config:
         options[OPTIONKEY_GROUP_SESSIONS_NUMBER] = 6
         options[OPTIONKEY_DAYS_CHECK] = True
         options[OPTIONKEY_DAYS_NUMBER] = 30
+        options[OPTIONKEY_AVERAGE_CHECK] = True
 
         # css
         self.get_data()[SECTION_CSS] = dict()

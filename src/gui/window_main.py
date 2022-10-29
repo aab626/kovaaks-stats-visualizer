@@ -7,7 +7,6 @@ import webbrowser
 
 import tkinter as tk
 from tkinter import ttk
-
 from PIL import ImageTk
 
 from models.playlist import Playlist
@@ -47,6 +46,7 @@ class MainWindow(tk.Tk):
         self.var_option_group_sessions_number = tk.StringVar(value=self.cfg.get_option(ckeys.OPTIONKEY_GROUP_SESSIONS_NUMBER))
         self.var_option_days_check = tk.BooleanVar(value=self.cfg.get_option(ckeys.OPTIONKEY_DAYS_CHECK))
         self.var_option_days_number = tk.StringVar(value=self.cfg.get_option(ckeys.OPTIONKEY_DAYS_NUMBER))
+        self.var_option_average_check = tk.BooleanVar(value=self.cfg.get_option(ckeys.OPTIONKEY_AVERAGE_CHECK))
         
         self.var_option_group_sessions_number.trace_add('write', self.f_command_option_group_sessions_number)
         self.var_option_days_number.trace_add('write', self.f_command_option_days_number)
@@ -155,13 +155,21 @@ class MainWindow(tk.Tk):
         checkbox_option_days.grid(row=0, column=0, sticky='nsw')
         self.entry_option_days.grid(row=0, column=1, sticky='nsw')
         label_option_days.grid(row=0, column=2, sticky='nsw')
+        
+        # option 4: display average curve
+        frame_option_average = ttk.Frame(frame_options)
+        checkbox_option_average = ttk.Checkbutton(frame_option_average, text='Display average data', variable=self.var_option_average_check, command=self.f_command_option_average_check)
+        frame_option_average.grid(row=3, column=0, sticky='news')
+        checkbox_option_average.grid(row=0, column=0, sticky='nsw')
 
+        # option (last): browse kovaaks folder
+        button_browse_folder = ttk.Button(frame_options, text='Change KovaaK\'s folder', command=self.command_browse_kovaaks_folder)
+        button_browse_folder.grid(row=4, column=0, sticky='ns', pady=(5, 5))
+
+        # after adding all children to options: add padding
         for frame_child in frame_options.winfo_children():
             frame_child.grid_configure(padx=(5, 5), pady=(2, 0))
 
-
-        button_browse_folder = ttk.Button(frame_options, text='Change KovaaK\'s folder', command=self.command_browse_kovaaks_folder)
-        button_browse_folder.grid(row=3, column=0, sticky='ns', pady=(5, 5))
 
         # right frame: generate button
         button_generate = ttk.Button(frame_right, text='Generate report', command=self.command_generate_report)
@@ -288,6 +296,10 @@ class MainWindow(tk.Tk):
             self.cfg.set_option(ckeys.OPTIONKEY_DAYS_NUMBER, int(self.var_option_days_number.get()))
         else:
             self.entry_option_days.configure(foreground='red')
+
+    # option: display average
+    def f_command_option_average_check(self, *args):
+        self.cfg.set_option(ckeys.OPTIONKEY_AVERAGE_CHECK, self.var_option_average_check.get())
 
     # generate commands
     def command_generate_report(self, *args):

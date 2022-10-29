@@ -107,7 +107,10 @@ class Report:
 		return scenarios_merged
 
 	# todo add percentage diff values over score/avg curves
-	def plot(self, data_x, data_y, data_y_avg, data_y_values, scenario_name, folder_path):
+	def plot(self, data_x, data_y, data_y_avg = None, data_y_values = None, scenario_name = None, folder_path = None):
+		if data_y_values is None or scenario_name is None or folder_path is None:
+			raise ValueError('data_y_values, scenario_name, folder_path cannot be None!')
+
 		if len(data_x) >= 2:
 			# smooth x data
 			x_floats = [date.timestamp() for date in data_x]
@@ -119,8 +122,9 @@ class Report:
 			y_smooth = interpolated_score(x_smooth_floats)
 
 			# average curve
-			interpolated_avg = PchipInterpolator(x_floats, data_y_avg)
-			y_smooth_avg = interpolated_avg(x_smooth_floats)
+			if data_y_avg is not None:
+				interpolated_avg = PchipInterpolator(x_floats, data_y_avg)
+				y_smooth_avg = interpolated_avg(x_smooth_floats)
 
 		fig, ax = plt.subplots(figsize=(10, 5))
 
@@ -140,14 +144,20 @@ class Report:
 		# plot curves
 		if len(data_x) >= 2:
 			ax.plot(x_smooth, y_smooth, '-', color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_SCORECURVE))
-			ax.plot(x_smooth, y_smooth_avg, '--', color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_AVERAGECURVE))
+
+			if data_y_avg is not None:
+				ax.plot(x_smooth, y_smooth_avg, '--', color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_AVERAGECURVE))
 		else:
 			ax.plot(data_x, data_y, '-', color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_SCORECURVE))
-			ax.plot(data_x, data_y_avg, '--', color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_AVERAGECURVE))
+
+			if data_y_avg is not None:
+				ax.plot(data_x, data_y_avg, '--', color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_AVERAGECURVE))
 
 		# plot points
 		ax.plot(data_x, data_y, 'o', color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_SCOREDATA), label='score')
-		ax.plot(data_x, data_y_avg, 'o', color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_AVERAGEDATA), label='avg')
+
+		if data_y_avg is not None:
+			ax.plot(data_x, data_y_avg, 'o', color=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_AVERAGEDATA), label='avg')
 
 		# ticks
 		xticks = []
@@ -262,10 +272,13 @@ class Report:
 								x_ungrouped, y_ungrouped = self.make_plottable_data(scenarios, target=TARGET_SCORE)
 								y_values = self.get_data_values(y_ungrouped)
 
-								# todo if plot average curve
-								y_avg = self.make_averaged_data(data[1], average_sessions=5)
-								y_avg_ungrouped = self.make_averaged_data(y_avg, average_sessions=5)
-								y_avg_values = self.get_data_values(y_avg_ungrouped)
+								# plot averages
+								if self.cfg.get_option(ckeys.OPTIONKEY_AVERAGE_CHECK):
+									y_avg = self.make_averaged_data(data[1], average_sessions=5)
+									y_avg_ungrouped = self.make_averaged_data(y_avg, average_sessions=5)
+									y_avg_values = self.get_data_values(y_avg_ungrouped)
+								else:
+									y_avg = None
 
 								with tag('div', klass='content'):
 									img_path = self.plot(data[0], data[1], y_avg, y_values, scenario_name, self.resources_folder_path)
@@ -294,7 +307,7 @@ class Report:
 													with tag('td', klass='value'):
 														text(y_values['max'])
 													with tag('td', klass='value'):
-														text(y_avg_values['max'])
+														text(y_avg_values['max'] if self.cfg.get_option(ckeys.OPTIONKEY_AVERAGE_CHECK) else '-')
 
 												with tag('tr', klass='row3'):
 													with tag('td', klass='category rightborder'):
@@ -302,7 +315,7 @@ class Report:
 													with tag('td', klass='value'):
 														text(y_values['min'])
 													with tag('td', klass='value'):
-														text(y_avg_values['min'])
+														text(y_avg_values['min'] if self.cfg.get_option(ckeys.OPTIONKEY_AVERAGE_CHECK) else '-')
 
 												with tag('tr', klass='row4'):
 													with tag('td', klass='category rightborder'):
@@ -310,7 +323,7 @@ class Report:
 													with tag('td', klass='value'):
 														text(y_values['avg'])
 													with tag('td', klass='value'):
-														text(y_avg_values['avg'])
+														text(y_avg_values['avg'] if self.cfg.get_option(ckeys.OPTIONKEY_AVERAGE_CHECK) else '-')
 
 												with tag('tr', klass='row5'):
 													with tag('td', klass='category rightborder'):
@@ -318,7 +331,7 @@ class Report:
 													with tag('td', klass='value'):
 														text(y_values['std'])
 													with tag('td', klass='value'):
-														text(y_avg_values['std'])
+														text(y_avg_values['std'] if self.cfg.get_option(ckeys.OPTIONKEY_AVERAGE_CHECK) else '-')
 
 							# otherwise, display an alert in the report
 							else:
