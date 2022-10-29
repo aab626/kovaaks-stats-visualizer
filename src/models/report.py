@@ -108,6 +108,7 @@ class Report:
 		return scenarios_merged
 
 	# todo add percentage diff values over score/avg curves
+	# todo change interpolator to pchip
 	def plot(self, data_x, data_y, data_y_avg, data_y_values, scenario_name, folder_path):
 		if len(data_x) >= 2:
 			# smooth x data

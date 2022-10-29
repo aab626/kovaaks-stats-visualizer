@@ -109,7 +109,7 @@ class CreatePlaylistWindow(tk.Toplevel):
 		if self.var_search.get() == '':
 			self.avaliable_scenarios = self.all_scenarios.copy()
 		else:
-			self.avaliable_scenarios = [s for s in self.all_scenarios if self.var_search.get().lower() in s]
+			self.avaliable_scenarios = [s for s in self.all_scenarios if self.var_search.get().lower() in s.lower()]
 
 		self.var_avaliable_scenarios.set(self.avaliable_scenarios)
 
