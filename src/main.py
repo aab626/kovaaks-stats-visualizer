@@ -5,6 +5,7 @@ from models.config import CONFIG_FILENAME
 from models.config import PATHKEY_KOVAAKS_FOLDER, PATHKEY_LOCAL_RESOURCES, PATHKEY_LOCAL_PLAYLISTS, PATHKEY_LOCAL_REPORTS
 from gui.window_main import MainWindow
 from gui.window_promptkovaaksfolder import BrowseKovaaksFolder
+from util.version import VersionChecker
 
 LOCAL_RESOURCES_FOLDERNAME = 'resources'
 LOCAL_PLAYLIST_FOLDERNAME = 'playlists'
@@ -18,6 +19,9 @@ class Main():
         cfg_path = os.path.join(os.getcwd(), CONFIG_FILENAME)
         cfg_exists_at_run = os.path.exists(cfg_path)
         self.cfg = Config(cfg_path)
+
+        # todo remember to alter version after changes
+        version_checker = VersionChecker()
 
         # check folders, then run koovaks folder prompt if no config was found earlier
         folders = self.create_folders()
