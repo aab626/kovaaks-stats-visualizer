@@ -213,7 +213,8 @@ class Report:
 					text('KovaaK\'s Stat Report')
 
 				css_path = os.path.join(self.resources_folder_path, CSS_FILENAME)
-				doc.stag('link', rel='stylesheet', href=css_path)
+				css_path_href = os.path.join('.', os.path.relpath(css_path, self.report_folder_path))
+				doc.stag('link', rel='stylesheet', href=css_path_href)
 
 			with tag('body'):
 				with tag('div', klass='header'):
@@ -268,7 +269,8 @@ class Report:
 
 								with tag('div', klass='content'):
 									img_path = self.plot(data[0], data[1], y_avg, y_values, scenario_name, self.resources_folder_path)
-									doc.stag('img', src=img_path, klass='graph')
+									img_path_href = os.path.join('.', os.path.relpath(img_path, self.report_folder_path))
+									doc.stag('img', src=img_path_href, klass='graph')
 
 									with tag('div', klass='data'):
 										with tag('h4', klass='title'):
