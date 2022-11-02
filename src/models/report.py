@@ -4,9 +4,11 @@ from datetime import datetime, date, timedelta
 
 import numpy as np
 from matplotlib import pyplot as plt
+import matplotlib.patheffects as pe
 from scipy.interpolate import PchipInterpolator
 
 import yattag
+import cssmin
 
 from models.scenario import Scenario
 from models.scenario import TARGET_SCORE
@@ -15,6 +17,8 @@ from models.config import Config
 
 CHAR_DELTA = '\u0394'
 CHAR_TRIANGLE = '\u2BC8'
+CHAR_TRIANGLE_SMALL_UP = '\u25B4'
+CHAR_TRIANGLE_SMALL_DOWN = '\u25BE'
 
 REPORT_RESOURCES_FOLDERNAME = 'report_resources'
 REPORT_FILENAME = 'KSV_report.html'
@@ -106,7 +110,11 @@ class Report:
 
 		return scenarios_merged
 
-	# todo add percentage diff values over score/avg curves
+	# plots a graph of one scenario
+	# data_x: datetimes
+	# data_y: scores or target value
+	# data_y_avg: averages over time of data_y
+	# data_y_values: statistical values of data_y (min, max, etc)
 	def plot(self, data_x, data_y, data_y_avg = None, data_y_values = None, scenario_name = None, folder_path = None):
 		if data_y_values is None or scenario_name is None or folder_path is None:
 			raise ValueError('data_y_values, scenario_name, folder_path cannot be None!')
@@ -200,6 +208,21 @@ class Report:
 		ax.spines['left'].set_color(self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_BORDERLEFT))
 		ax.spines['bottom'].set_color(self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_BORDERBOTTOM))
 
+		# annotations
+		if self.cfg.get_option(ckeys.OPTIONKEY_PERCENTAGES_CHECK) and self.cfg.get_option(ckeys.OPTIONKEY_AVERAGE_CHECK):
+			for i in range(len(data_y)):
+				percentage = data_y[i]/data_y_avg[i]*100
+
+				if percentage != 100:
+					percentage_txt = round(percentage - 100 if percentage > 100 else 100 - percentage, 1)
+					color = self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_PERCENTAGE_POSITIVE) if percentage > 100 else self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_PERCENTAGE_NEGATIVE)
+					symbol = CHAR_TRIANGLE_SMALL_UP if percentage > 100 else CHAR_TRIANGLE_SMALL_DOWN
+					text = f'{symbol} {percentage_txt}%'
+					y_offset = 50 if percentage > 100 else -50
+
+					ax.annotate(text, (data_x[i], data_y[i]), ha='center', textcoords='offset pixels', xytext=(0, y_offset), 
+                                            color=color, fontsize=9, path_effects=[pe.withStroke(linewidth=1.5, foreground=self.cfg.get_graph(ckeys.GRAPHKEY_COLOR_PERCENTAGE_OUTLINE))])
+
 		# layout
 		fig.tight_layout()
 
@@ -253,7 +276,7 @@ class Report:
 						with tag('div', klass='scenario'):
 							with tag('div', klass='title'):
 								with tag('p', klass='icon'):
-									text(CHAR_TRIANGLE)
+									text(f'{str(i+1).zfill(2)} {CHAR_TRIANGLE}')
 								with tag('h3', klass='name'):
 									text(scenario_name)
 							
@@ -380,7 +403,8 @@ class Report:
 		css_content = css_content.replace(replacer_color_main, self.cfg.get_css(ckeys.CSSKEY_COLOR_MAIN))
 		css_content = css_content.replace(replacer_color_secondary, self.cfg.get_css(ckeys.CSSKEY_COLOR_SECONDARY))
 
-		return css_content
+		css_content_minified = cssmin.cssmin(css_content)
+		return css_content_minified
 
 	def write_css(self, css_content):
 		fpath = os.path.join(self.resources_folder_path, CSS_FILENAME)

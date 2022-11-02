@@ -47,6 +47,7 @@ class MainWindow(tk.Tk):
         self.var_option_days_check = tk.BooleanVar(value=self.cfg.get_option(ckeys.OPTIONKEY_DAYS_CHECK))
         self.var_option_days_number = tk.StringVar(value=self.cfg.get_option(ckeys.OPTIONKEY_DAYS_NUMBER))
         self.var_option_average_check = tk.BooleanVar(value=self.cfg.get_option(ckeys.OPTIONKEY_AVERAGE_CHECK))
+        self.var_option_percentage_check = tk.BooleanVar(value=self.cfg.get_option(ckeys.OPTIONKEY_PERCENTAGES_CHECK))
         
         self.var_option_group_sessions_number.trace_add('write', self.f_command_option_group_sessions_number)
         self.var_option_days_number.trace_add('write', self.f_command_option_days_number)
@@ -162,14 +163,21 @@ class MainWindow(tk.Tk):
         frame_option_average.grid(row=3, column=0, sticky='news')
         checkbox_option_average.grid(row=0, column=0, sticky='nsw')
 
+        # option 5: display percentage vs average
+        frame_option_percentages = ttk.Frame(frame_options)
+        self.checkbox_option_percentages = ttk.Checkbutton(frame_option_percentages, text='Display percentage vs average', variable=self.var_option_percentage_check, command=self.f_command_option_percentage_check)
+        state = 'enabled' if self.var_option_average_check.get() else 'disabled'
+        self.checkbox_option_percentages.config(state=state)
+        frame_option_percentages.grid(row=4, column=0, sticky='news')
+        self.checkbox_option_percentages.grid(row=0, column=0, sticky='nsw')
+
         # option (last): browse kovaaks folder
         button_browse_folder = ttk.Button(frame_options, text='Change KovaaK\'s folder', command=self.command_browse_kovaaks_folder)
-        button_browse_folder.grid(row=4, column=0, sticky='ns', pady=(5, 5))
+        button_browse_folder.grid(row=5, column=0, sticky='ns', pady=(5, 5))
 
         # after adding all children to options: add padding
         for frame_child in frame_options.winfo_children():
             frame_child.grid_configure(padx=(5, 5), pady=(2, 0))
-
 
         # right frame: generate button
         button_generate = ttk.Button(frame_right, text='Generate report', command=self.command_generate_report)
@@ -300,6 +308,15 @@ class MainWindow(tk.Tk):
     # option: display average
     def f_command_option_average_check(self, *args):
         self.cfg.set_option(ckeys.OPTIONKEY_AVERAGE_CHECK, self.var_option_average_check.get())
+
+        state = 'enabled' if self.var_option_average_check.get() else 'disabled'
+        self.checkbox_option_percentages.config(state=state)
+
+
+    # option: display percentages vs average
+    def f_command_option_percentage_check(self, *args):
+        self.cfg.set_option(ckeys.OPTIONKEY_PERCENTAGES_CHECK, self.var_option_percentage_check.get())
+
 
     # generate commands
     def command_generate_report(self, *args):

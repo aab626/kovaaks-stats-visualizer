@@ -32,6 +32,9 @@ GRAPHKEY_COLOR_YTICKS = 'color:yticks'
 GRAPHKEY_COLOR_YTICKSLABELS = 'color:ytickslabels'
 GRAPHKEY_COLOR_BORDERLEFT = 'color:border_left'
 GRAPHKEY_COLOR_BORDERBOTTOM = 'color:border_bottom'
+GRAPHKEY_COLOR_PERCENTAGE_POSITIVE = 'color:percentage_positive'
+GRAPHKEY_COLOR_PERCENTAGE_NEGATIVE = 'color:percentage_negative'
+GRAPHKEY_COLOR_PERCENTAGE_OUTLINE = 'color:percentage_outline'
 
 CSSKEY_COLOR_BACKGROUND = 'color:background'
 CSSKEY_COLOR_TEXT = 'color:text'
@@ -45,6 +48,7 @@ OPTIONKEY_GROUP_SESSIONS_NUMBER = 'option:group_sessions_number'
 OPTIONKEY_DAYS_CHECK = 'option:days_check'
 OPTIONKEY_DAYS_NUMBER = 'option:days_number'
 OPTIONKEY_AVERAGE_CHECK = 'option:display_average_check'
+OPTIONKEY_PERCENTAGES_CHECK = 'option:percentages_check'
 
 APPKEY_VERSION = 'version:version_number'
 APPKEY_VERSION_OUTDATED = 'version:version_outdated'
@@ -105,6 +109,7 @@ class Config:
         options[OPTIONKEY_DAYS_CHECK] = True
         options[OPTIONKEY_DAYS_NUMBER] = 30
         options[OPTIONKEY_AVERAGE_CHECK] = True
+        options[OPTIONKEY_PERCENTAGES_CHECK] = True
 
         # css
         self.get_data()[SECTION_CSS] = dict()
@@ -133,6 +138,9 @@ class Config:
         graphs[GRAPHKEY_COLOR_YTICKSLABELS] = '#F1F1F9'
         graphs[GRAPHKEY_COLOR_BORDERLEFT] = '#47DDFF'
         graphs[GRAPHKEY_COLOR_BORDERBOTTOM] = '#47DDFF'
+        graphs[GRAPHKEY_COLOR_PERCENTAGE_POSITIVE] = '#47DDFF'
+        graphs[GRAPHKEY_COLOR_PERCENTAGE_NEGATIVE] = '#EC368D'
+        graphs[GRAPHKEY_COLOR_PERCENTAGE_OUTLINE] = '#000000'
 
         # app
         self.get_data()[SECTION_APP] = dict()
