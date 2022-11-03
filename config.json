@@ -1,0 +1,50 @@
+{
+    "PATHS": {
+        "kovaaks_folder": null,
+        "kovaaks_stats": null,
+        "kovaaks_playlists": null,
+        "local_resources": null,
+        "local_playlists": null,
+        "local_reports": null,
+        "local_css": null
+    },
+    "OPTIONS": {
+        "option:auto_open_check": true,
+        "option:group_sessions_check": true,
+        "option:group_sessions_number": 6,
+        "option:days_check": true,
+        "option:days_number": 30,
+        "option:display_average_check": true,
+        "option:percentages_check": true
+    },
+    "CSS": {
+        "color:background": "#342E5C",
+        "color:text": "#F1F1F9",
+        "color:titles": "#F2FF49",
+        "color:main": "#47DDFF",
+        "color:secondary": "#EC368D"
+    },
+    "GRAPHS": {
+        "color:weekline": "#7f7f7f",
+        "color:min": "#47DDFF",
+        "color:max": "#47DDFF",
+        "color:score_curve": "#47DDFF",
+        "color:score_data": "#4781ff",
+        "color:average_curve": "#EC368D",
+        "color:average_data": "#F2FF49",
+        "color:xticks": "#47DDFF",
+        "color:xtickslabels": "#F1F1F9",
+        "color:yticks": "#47DDFF",
+        "color:ytickslabels": "#F1F1F9",
+        "color:border_left": "#47DDFF",
+        "color:border_bottom": "#47DDFF",
+        "color:percentage_positive": "#47DDFF",
+        "color:percentage_negative": "#EC368D",
+        "color:percentage_outline": "#000000"
+    },
+    "APP": {
+        "version:version_number": null,
+        "version:version_outdated": false,
+        "version:version_misscheck": false
+    }
+}
